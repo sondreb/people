@@ -10,6 +10,7 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
   template: `
     <div class="contacts-list">
       <div *ngFor="let contact of contacts" class="contact-card">
+        <img [src]="contact.imageUrl || 'images/profile.png'" alt="Profile image" class="contact-image">
         <div class="contact-info">
           <h3>{{ contact.name }}</h3>
           <div *ngFor="let email of contact.emails" class="contact-detail">
@@ -38,6 +39,17 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
   styles: [`
     .contact-detail {
       margin: 4px 0;
+    }
+    .contact-image {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 15px;
+    }
+    .contact-card {
+      display: flex;
+      align-items: center;
     }
   `],
   standalone: true,

@@ -9,6 +9,12 @@ import { StorageService } from '../services/storage.service';
   template: `<div class="add-contact-container">
   <h2>{{ isEditMode ? 'Edit Contact' : 'Add New Contact' }}</h2>
   <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+    <div class="image-upload">
+      <img [src]="imagePreview || 'images/profile.png'" alt="Profile image" class="profile-image">
+      <input type="file" accept="image/*" (change)="onImageSelected($event)" #fileInput>
+      <button type="button" (click)="fileInput.click()" class="add-btn">Choose Image</button>
+      <button *ngIf="imagePreview" type="button" (click)="removeImage()" class="remove-btn">Remove Image</button>
+    </div>
     <div>
       <label for="name">Name:</label>
       <input id="name" type="text" formControlName="name">
@@ -56,6 +62,20 @@ import { StorageService } from '../services/storage.service';
       margin: 8px 0;
       background: #4CAF50;
     }
+    .image-upload {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .profile-image {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    input[type="file"] {
+      display: none;
+    }
   `],
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule]
@@ -64,6 +84,8 @@ export class ContactComponent implements OnInit {
   contactForm: FormGroup;
   isEditMode = false;
   contactId?: number;
+  imagePreview: string | null = null;
+  private imageFile: File | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -74,7 +96,8 @@ export class ContactComponent implements OnInit {
     this.contactForm = this.fb.group({
       name: ['', Validators.required],
       emails: this.fb.array([]),
-      phones: this.fb.array([])
+      phones: this.fb.array([]),
+      imageUrl: ['']
     });
   }
 
@@ -102,6 +125,28 @@ export class ContactComponent implements OnInit {
     this.phones.removeAt(index);
   }
 
+  async onImageSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.imageFile = file;
+      this.imagePreview = await this.readFileAsDataUrl(file);
+    }
+  }
+
+  removeImage() {
+    this.imageFile = null;
+    this.imagePreview = null;
+    this.contactForm.patchValue({ imageUrl: '' });
+  }
+
+  private readFileAsDataUrl(file: File): Promise<string> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsDataURL(file);
+    });
+  }
+
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -109,7 +154,11 @@ export class ContactComponent implements OnInit {
       this.contactId = Number(id);
       const contact = await this.storage.getContact(this.contactId);
       if (contact) {
-        this.contactForm.patchValue({ name: contact.name });
+        this.contactForm.patchValue({ 
+          name: contact.name,
+          imageUrl: contact.imageUrl 
+        });
+        this.imagePreview = contact.imageUrl || null;
         
         contact.emails?.forEach(email => {
           this.emails.push(this.fb.control(email));
@@ -131,7 +180,8 @@ export class ContactComponent implements OnInit {
       const contact = {
         ...formValue,
         emails: formValue.emails?.filter((e: string) => e.trim().length > 0) || [],
-        phones: formValue.phones?.filter((p: string) => p.trim().length > 0) || []
+        phones: formValue.phones?.filter((p: string) => p.trim().length > 0) || [],
+        imageUrl: this.imagePreview
       };
       
       if (this.isEditMode && this.contactId) {

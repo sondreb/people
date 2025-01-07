@@ -3,4 +3,5 @@ export interface Contact {
     name: string;
     emails?: string[];
     phones?: string[];
+    imageUrl?: string;
 }
