@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1736282294880,
+  "timestamp": 1736282520849,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -57,7 +57,7 @@
     "/images/profile.png": "35f15a95e5fc7939121c71638a0cd8fe9830f7b6",
     "/index.html": "51f54252053272f0ad608d803ebe9d7e05a23342",
     "/main-ZOEZAC67.js": "7cfb44da79955f87022af1c955779f4681158c08",
-    "/manifest.webmanifest": "8fae6b69be791c7a37552a55368e7ddb0de4cf8e",
+    "/manifest.webmanifest": "236808e494dfc54353edb692883a9c0ce78a668a",
     "/polyfills-FFHMD2TL.js": "f49b49a155bc7d192db62a4c15d0a612b460a667",
     "/styles-LHYXXDUR.css": "345eecb77931cb098ba88ccb8c24128810b76b9b"
   },
