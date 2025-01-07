@@ -9,9 +9,9 @@ import { NavBarComponent } from './components/nav-bar.component';
     <app-nav-bar></app-nav-bar>
     <header>
       <h1>People Manager</h1>
-      <button *ngIf="showInstallButton" (click)="installPwa()">
+      <!-- <button *ngIf="showInstallButton" (click)="installPwa()">
         Install App
-      </button>
+      </button> -->
     </header>
 
     <router-outlet></router-outlet>
@@ -67,29 +67,11 @@ import { NavBarComponent } from './components/nav-bar.component';
   imports: [CommonModule, RouterModule, NavBarComponent],
 })
 export class AppComponent implements OnInit {
-  deferredPrompt: any;
-  showInstallButton = false;
   title = 'Home';
 
   constructor() {}
 
   ngOnInit() {
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      this.deferredPrompt = e;
-      this.showInstallButton = true;
-    });
-  }
 
-  async installPwa() {
-    if (!this.deferredPrompt) return;
-
-    this.deferredPrompt.prompt();
-    const { outcome } = await this.deferredPrompt.userChoice;
-
-    if (outcome === 'accepted') {
-      this.showInstallButton = false;
-    }
-    this.deferredPrompt = null;
   }
 }

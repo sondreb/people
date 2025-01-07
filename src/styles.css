@@ -49,6 +49,12 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+.square-icon {
+  width: 24px;
+  height: 24px;
+  text-align: center;
+}
+
 .add-button {
   position: fixed;
   bottom: 24px;

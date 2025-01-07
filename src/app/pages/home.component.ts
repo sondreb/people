@@ -37,7 +37,7 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
         </div>
       </div>
       <a routerLink="/contact" class="add-button">
-        <i class="fas fa-plus"></i>
+        <i class="fas fa-plus square-icon"></i>
       </a>
     </div>
     <app-confirm-dialog
