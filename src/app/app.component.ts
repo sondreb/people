@@ -1,19 +1,75 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 @Component({
-    selector: 'app-root',
-    imports: [RouterOutlet, CommonModule, FormsModule],
-    templateUrl: './app.component.html',
-    styleUrl: './app.component.css'
+  selector: 'app-root',
+  template: `<div class="app-container">
+    <header>
+      <h1>People Manager</h1>
+      <button *ngIf="showInstallButton" (click)="installPwa()">
+        Install App
+      </button>
+    </header>
+
+    <router-outlet></router-outlet>
+  </div>`,
+  styles: `.fullscreen-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .fullscreen-container .logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .fullscreen-container h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 3rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .install-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: transform 0.2s;
+  }
+  
+  .install-button:hover {
+    transform: scale(1.05);
+    background-color: #0056b3;
+  }
+  `,
+  standalone: true,
+  imports: [CommonModule, RouterModule],
 })
 export class AppComponent implements OnInit {
   deferredPrompt: any;
   showInstallButton = false;
-  contacts: any[] = [];
-  newContact: any = {};
+  title = 'Home';
+
+  constructor() {}
 
   ngOnInit() {
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -25,40 +81,13 @@ export class AppComponent implements OnInit {
 
   async installPwa() {
     if (!this.deferredPrompt) return;
-    
+
     this.deferredPrompt.prompt();
     const { outcome } = await this.deferredPrompt.userChoice;
-    
+
     if (outcome === 'accepted') {
       this.showInstallButton = false;
     }
     this.deferredPrompt = null;
-  }
-
-  addContact() {
-    this.contacts.push(this.newContact);
-    this.newContact = {};
-  }
-
-  editContact(contact: any) {
-    this.newContact = contact;
-  }
-
-  deleteContact(contact: any) {
-    const index = this.contacts.indexOf(contact);
-    if (index > -1) {
-      this.contacts.splice(index, 1);
-    }
-  }
-
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.newContact.photo = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
   }
 }
