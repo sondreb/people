@@ -6,73 +6,178 @@ import { StorageService } from '../services/storage.service';
 
 @Component({
   selector: 'app-contact',
-  template: `<div class="add-contact-container">
-  <h2>{{ isEditMode ? 'Edit Contact' : 'Add New Contact' }}</h2>
-  <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
-    <div class="image-upload">
-      <img [src]="imagePreview || 'images/profile.png'" alt="Profile image" class="profile-image">
-      <input type="file" accept="image/*" (change)="onImageSelected($event)" #fileInput>
-      <button type="button" (click)="fileInput.click()" class="add-btn">Choose Image</button>
-      <button *ngIf="imagePreview" type="button" (click)="removeImage()" class="remove-btn">Remove Image</button>
-    </div>
-    <div>
-      <label for="name">Name:</label>
-      <input id="name" type="text" formControlName="name">
-    </div>
-    <div formArrayName="emails">
-      <label>Email Addresses: (optional)</label>
-      <div *ngFor="let email of emails.controls; let i=index" class="array-entry">
-        <input [formControlName]="i" type="email" [placeholder]="'Email ' + (i + 1)">
-        <button type="button" (click)="removeEmail(i)" class="remove-btn">✕</button>
+  template: `
+    <div class="page-container">
+      <div class="form-card">
+        <h2>{{ isEditMode ? 'Edit Contact' : 'Add New Contact' }}</h2>
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+          <div class="image-upload">
+            <div class="image-container">
+              <img [src]="imagePreview || 'images/profile.png'" alt="Profile image" class="profile-image">
+              <button type="button" (click)="fileInput.click()" class="change-image-btn">
+                <i class="fas fa-camera"></i>
+              </button>
+            </div>
+            <input type="file" accept="image/*" (change)="onImageSelected($event)" #fileInput>
+          </div>
+
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input id="name" type="text" formControlName="name" placeholder="Enter name">
+          </div>
+
+          <div class="form-group" formArrayName="emails">
+            <label>Email Addresses</label>
+            <div *ngFor="let email of emails.controls; let i=index" class="array-entry">
+              <input [formControlName]="i" type="email" [placeholder]="'Email address ' + (i + 1)">
+              <button type="button" class="remove-btn" (click)="removeEmail(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <button type="button" class="add-btn" (click)="addEmail()">
+              <i class="fas fa-plus"></i> Add Email
+            </button>
+          </div>
+
+          <div class="form-group" formArrayName="phones">
+            <label>Phone Numbers</label>
+            <div *ngFor="let phone of phones.controls; let i=index" class="array-entry">
+              <input [formControlName]="i" type="tel" [placeholder]="'Phone number ' + (i + 1)">
+              <button type="button" class="remove-btn" (click)="removePhone(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <button type="button" class="add-btn" (click)="addPhone()">
+              <i class="fas fa-plus"></i> Add Phone
+            </button>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
+            <button type="submit" [disabled]="!contactForm.valid">
+              {{ isEditMode ? 'Update' : 'Add' }} Contact
+            </button>
+          </div>
+        </form>
       </div>
-      <button type="button" (click)="addEmail()" class="add-btn">Add Email</button>
     </div>
-    <div formArrayName="phones">
-      <label>Phone Numbers: (optional)</label>
-      <div *ngFor="let phone of phones.controls; let i=index" class="array-entry">
-        <input [formControlName]="i" type="tel" [placeholder]="'Phone ' + (i + 1)">
-        <button type="button" (click)="removePhone(i)" class="remove-btn">✕</button>
-      </div>
-      <button type="button" (click)="addPhone()" class="add-btn">Add Phone</button>
-    </div>
-    <div class="button-group">
-      <button type="submit" [disabled]="!contactForm.valid">
-        {{ isEditMode ? 'Update' : 'Add' }} Contact
-      </button>
-      <button type="button" (click)="cancel()">Cancel</button>
-    </div>
-  </form>
-</div>`,
+  `,
   styles: [`
-    // ...existing styles...
-    .button-group {
-      display: flex;
-      gap: 10px;
+    .page-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
     }
+
+    .form-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      margin: 0 0 24px 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .image-upload {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .image-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 60px;
+      object-fit: cover;
+    }
+
+    .change-image-btn {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
     .array-entry {
       display: flex;
       gap: 8px;
       margin-bottom: 8px;
     }
-    .remove-btn {
-      padding: 0 8px;
-      background: #ff4444;
+
+    .array-entry input {
+      flex: 1;
     }
+
     .add-btn {
-      margin: 8px 0;
-      background: #4CAF50;
+      background: var(--success);
+      color: white;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
     }
-    .image-upload {
-      text-align: center;
-      margin-bottom: 20px;
+
+    .remove-btn {
+      background: var(--danger);
+      color: white;
+      padding: 8px;
     }
-    .profile-image {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 10px;
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
     }
+
+    .form-actions button {
+      flex: 1;
+      padding: 12px;
+    }
+
+    .cancel-btn {
+      background: var(--text-light);
+      color: white;
+    }
+
+    button[type="submit"] {
+      background: var(--primary);
+      color: white;
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
     input[type="file"] {
       display: none;
     }
