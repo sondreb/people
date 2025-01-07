@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StorageService } from '../services/storage.service';
+import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmDialogComponent],
   template: `
     <div class="page-container">
       <div class="settings-card">
@@ -13,10 +14,16 @@ import { StorageService } from '../services/storage.service';
         
         <div class="setting-group">
           <h2>Data Management</h2>
-          <button class="danger-btn" (click)="clearData()">
-            <i class="fas fa-trash"></i>
-            Clear All Data
-          </button>
+          <div class="button-group">
+            <button class="primary-btn" (click)="exportData()">
+              <i class="fas fa-file-export"></i>
+              Export Contacts
+            </button>
+            <button class="danger-btn" (click)="showDeleteConfirm()">
+              <i class="fas fa-trash"></i>
+              Clear All Data
+            </button>
+          </div>
         </div>
 
         <div class="setting-group">
@@ -25,6 +32,14 @@ import { StorageService } from '../services/storage.service';
         </div>
       </div>
     </div>
+
+    <app-confirm-dialog
+      [visible]="showDialog"
+      title="Clear All Data"
+      message="Are you sure you want to delete all contacts? This action cannot be undone."
+      (confirm)="confirmClear()"
+      (cancel)="cancelClear()"
+    ></app-confirm-dialog>
   `,
   styles: [`
     .page-container {
@@ -59,16 +74,50 @@ import { StorageService } from '../services/storage.service';
       align-items: center;
       gap: 8px;
     }
+    .button-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .primary-btn {
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   `]
 })
 export class SettingsComponent {
+  showDialog = false;
+
   constructor(private storage: StorageService) {}
 
-  async clearData() {
-    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-      // Add method to storage service to clear data
-      await this.storage.clearAllData();
-      window.location.reload();
-    }
+  showDeleteConfirm() {
+    this.showDialog = true;
+  }
+
+  async confirmClear() {
+    await this.storage.clearAllData();
+    this.showDialog = false;
+    window.location.reload();
+  }
+
+  cancelClear() {
+    this.showDialog = false;
+  }
+
+  async exportData() {
+    const contacts = await this.storage.getAllContacts();
+    const json = JSON.stringify(contacts, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `contacts-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 }
