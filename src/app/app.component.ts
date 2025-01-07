@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { NavBarComponent } from './components/nav-bar.component';
 
 @Component({
   selector: 'app-root',
   template: `<div class="app-container">
+    <app-nav-bar></app-nav-bar>
     <header>
       <h1>People Manager</h1>
       <button *ngIf="showInstallButton" (click)="installPwa()">
@@ -62,7 +64,7 @@ import { CommonModule } from '@angular/common';
   }
   `,
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NavBarComponent],
 })
 export class AppComponent implements OnInit {
   deferredPrompt: any;

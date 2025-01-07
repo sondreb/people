@@ -19,7 +19,7 @@ body {
   color: var(--text);
   line-height: 1.5;
   margin: 0;
-  padding: 20px;
+  padding: 0;  /* Remove padding */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
