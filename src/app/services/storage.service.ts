@@ -103,6 +103,59 @@ export class StorageService {
     });
   }
 
+  async importContacts(contacts: Contact[]): Promise<void> {
+    await this.ensureDb();
+    const transaction = this.db!.transaction(this.storeName, 'readwrite');
+    const store = transaction.objectStore(this.storeName);
+
+    return new Promise((resolve, reject) => {
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+
+      contacts.forEach(contact => {
+        store.add(contact);
+      });
+    });
+  }
+
+  parseCsvContacts(csvContent: string): Contact[] {
+    const lines = csvContent.split('\n');
+    const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+    const contacts: Contact[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      
+      const values = lines[i].split(',').map(v => v.trim());
+      const contact: Contact = { name: '' };
+      const emails: string[] = [];
+      const phones: string[] = [];
+
+      headers.forEach((header, index) => {
+        const value = values[index];
+        if (!value) return;
+
+        if (header.includes('name')) {
+          contact.name = value;
+        }
+        else if (header.includes('email')) {
+          emails.push(value);
+        }
+        else if (header.includes('phone')) {
+          phones.push(value);
+        }
+      });
+
+      if (contact.name) {
+        contact.emails = emails;
+        contact.phones = phones;
+        contacts.push(contact);
+      }
+    }
+
+    return contacts;
+  }
+
   private async ensureDb(): Promise<void> {
     if (!this.db) {
       await this.initDb();
