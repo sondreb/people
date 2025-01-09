@@ -159,15 +159,13 @@ export class StorageService {
         insideQuotes = !insideQuotes;
         currentLine += char;
       } else if (char === '\n' && !insideQuotes) {
-        if (currentLine.trim()) {
-          lines.push(currentLine);
-        }
+        lines.push(currentLine); // Remove the trim() check here
         currentLine = '';
       } else {
         currentLine += char;
       }
     }
-    if (currentLine.trim()) {
+    if (currentLine) { // Remove trim() check here as well
       lines.push(currentLine);
     }
 
@@ -176,6 +174,9 @@ export class StorageService {
     const contacts: Contact[] = [];
 
     for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line) continue; // Skip truly empty lines, but keep lines with just commas
+      
       const values = parseCSVLine(lines[i]);
       const contact: Contact = { name: '' };
       const emails: string[] = [];

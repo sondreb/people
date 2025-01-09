@@ -7,52 +7,50 @@ export type Theme = 'light' | 'dark' | 'auto';
   providedIn: 'root'
 })
 export class ThemeService {
-  private readonly THEME_KEY = 'preferred-theme';
-  private themeSubject = new BehaviorSubject<Theme>(this.getStoredTheme());
+  private theme = new BehaviorSubject<Theme>('auto');
+  private mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
   constructor() {
-    this.initialize();
-  }
-
-  private initialize() {
-    this.applyTheme(this.themeSubject.value);
-    if (this.themeSubject.value === 'auto') {
-      this.setupMediaQueryListener();
-    }
-  }
-
-  private setupMediaQueryListener() {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
-      if (this.themeSubject.value === 'auto') {
-        document.documentElement.dataset['theme'] = e.matches ? 'dark' : 'light';
+    this.mediaQuery.addEventListener('change', (e) => {
+      if (this.theme.value === 'auto') {
+        this.applyTheme('auto');
       }
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
-    handleChange(mediaQuery); // Initial check
+    });
   }
 
-  private getStoredTheme(): Theme {
-    return (localStorage.getItem(this.THEME_KEY) as Theme) || 'auto';
+  initialize(): Promise<void> {
+    return new Promise((resolve) => {
+      const savedTheme = localStorage.getItem('theme') as Theme;
+      // Apply theme immediately before any rendering
+      if (savedTheme) {
+        this.setTheme(savedTheme);
+      } else {
+        this.applyTheme('auto');
+      }
+      resolve();
+    });
   }
 
   getCurrentTheme() {
-    return this.themeSubject.asObservable();
+    return this.theme.asObservable();
   }
 
   setTheme(theme: Theme) {
-    localStorage.setItem(this.THEME_KEY, theme);
-    this.themeSubject.next(theme);
+    localStorage.setItem('theme', theme);
+    this.theme.next(theme);
     this.applyTheme(theme);
   }
 
   private applyTheme(theme: Theme) {
+    const root = document.documentElement;
+    
     if (theme === 'auto') {
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.dataset['theme'] = isDark ? 'dark' : 'light';
+      const isDark = this.mediaQuery.matches;
+      root.setAttribute('data-theme', isDark ? 'dark' : 'light');
     } else {
-      document.documentElement.dataset['theme'] = theme;
+      root.setAttribute('data-theme', theme);
     }
+    
+    this.theme.next(theme);
   }
 }
