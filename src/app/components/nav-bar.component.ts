@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
     <nav class="nav-bar">
       <div class="nav-content">
         <div class="nav-brand">
-          <a routerLink="/">Contacts</a>
+          <a routerLink="/">People</a>
         </div>
         <div class="nav-items">
           <button *ngIf="deferredPrompt" class="install-btn" (click)="installApp()">

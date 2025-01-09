@@ -7,13 +7,6 @@ import { NavBarComponent } from './components/nav-bar.component';
   selector: 'app-root',
   template: `<div class="app-container">
     <app-nav-bar></app-nav-bar>
-    <header>
-      <h1>People Manager</h1>
-      <!-- <button *ngIf="showInstallButton" (click)="installPwa()">
-        Install App
-      </button> -->
-    </header>
-
     <router-outlet></router-outlet>
   </div>`,
   styles: `.fullscreen-container {
@@ -71,7 +64,5 @@ export class AppComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-
-  }
+  ngOnInit() {}
 }

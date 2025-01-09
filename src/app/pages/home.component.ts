@@ -9,7 +9,7 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
   selector: 'app-home',
   template: `
     <div class="page-container">
-      <h1 class="page-title">Contacts</h1>
+      <h1 class="page-title">People</h1>
       <div class="contacts-list">
         <div *ngFor="let contact of contacts" class="contact-card">
           <img [src]="contact.imageUrl || 'images/profile.png'" alt="Profile image" class="contact-image">

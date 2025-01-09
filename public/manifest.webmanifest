@@ -1,11 +1,17 @@
 {
   "name": "People",
   "short_name": "People",
+  "author": "SondreB",
+  "description": "Wonderful app to keep your people's information in one place",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
+  "launch_handler": {
+    "client_mode": ["focus-existing", "navigate-existing"]
+  },
+  "capture_links": "existing-client-prefer",
   "icons": [
     {
       "src": "icons/icon-72x72.png",
