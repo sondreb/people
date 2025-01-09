@@ -119,14 +119,64 @@ export class StorageService {
   }
 
   parseCsvContacts(csvContent: string): Contact[] {
-    const lines = csvContent.split('\n');
-    const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+    const parseCSVLine = (line: string): string[] => {
+      const result: string[] = [];
+      let field = '';
+      let insideQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+          if (i + 1 < line.length && line[i + 1] === '"') {
+            // Handle escaped quotes
+            field += '"';
+            i++; // Skip next quote
+          } else {
+            insideQuotes = !insideQuotes;
+          }
+        } else if (char === ',' && !insideQuotes) {
+          result.push(field.trim());
+          field = '';
+        } else {
+          field += char;
+        }
+      }
+      
+      result.push(field.trim());
+      return result;
+    };
+
+    // Split content into lines while preserving newlines in quoted fields
+    const lines: string[] = [];
+    let currentLine = '';
+    let insideQuotes = false;
+    
+    for (let i = 0; i < csvContent.length; i++) {
+      const char = csvContent[i];
+      
+      if (char === '"') {
+        insideQuotes = !insideQuotes;
+        currentLine += char;
+      } else if (char === '\n' && !insideQuotes) {
+        if (currentLine.trim()) {
+          lines.push(currentLine);
+        }
+        currentLine = '';
+      } else {
+        currentLine += char;
+      }
+    }
+    if (currentLine.trim()) {
+      lines.push(currentLine);
+    }
+
+    // Parse headers and create contacts
+    const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
     const contacts: Contact[] = [];
 
     for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue;
-      
-      const values = lines[i].split(',').map(v => v.trim());
+      const values = parseCSVLine(lines[i]);
       const contact: Contact = { name: '' };
       const emails: string[] = [];
       const phones: string[] = [];
@@ -135,14 +185,15 @@ export class StorageService {
         const value = values[index];
         if (!value) return;
 
+        // Remove surrounding quotes if they exist
+        const cleanValue = value.replace(/^"(.*)"$/, '$1').replace(/""/g, '"');
+
         if (header.includes('name')) {
-          contact.name = value;
-        }
-        else if (header.includes('email')) {
-          emails.push(value);
-        }
-        else if (header.includes('phone')) {
-          phones.push(value);
+          contact.name = cleanValue;
+        } else if (header.includes('email')) {
+          emails.push(cleanValue);
+        } else if (header.includes('phone')) {
+          phones.push(cleanValue);
         }
       });
 
