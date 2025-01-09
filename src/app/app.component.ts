@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavBarComponent } from './components/nav-bar.component';
+import { UpdateNotificationComponent } from './components/update-notification.component';
 
 @Component({
   selector: 'app-root',
   template: `<div class="app-container">
+    <app-update-notification></app-update-notification>
     <app-nav-bar></app-nav-bar>
     <router-outlet></router-outlet>
   </div>`,
@@ -57,7 +59,7 @@ import { NavBarComponent } from './components/nav-bar.component';
   }
   `,
   standalone: true,
-  imports: [CommonModule, RouterModule, NavBarComponent],
+  imports: [CommonModule, RouterOutlet, NavBarComponent, UpdateNotificationComponent],
 })
 export class AppComponent implements OnInit {
   title = 'Home';
