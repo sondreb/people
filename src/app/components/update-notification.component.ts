@@ -15,27 +15,29 @@ import { UpdateService } from '../services/update.service';
   styles: [`
     .update-notification {
       position: fixed;
-      top: 0;
+      bottom: 0;          /* Changed from top: 0 to bottom: 0 */
       left: 0;
       right: 0;
       background: var(--primary);
       color: white;
-      padding: 12px;
+      padding: 16px;      /* Slightly increased padding */
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 16px;
       z-index: 1000;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);  /* Added top shadow */
     }
 
     button {
       background: white;
       color: var(--primary);
       border: none;
-      padding: 6px 12px;
+      padding: 8px 16px;  /* Slightly increased padding */
       border-radius: 4px;
       cursor: pointer;
       font-weight: 500;
+      transition: background-color 0.2s;  /* Added transition */
     }
 
     button:hover {
