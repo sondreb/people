@@ -190,16 +190,29 @@ export class StorageService {
 
         if (header.includes('name')) {
           contact.name = cleanValue;
+        } else if (header.includes('company')) {
+          contact.company = cleanValue;
         } else if (header.includes('email')) {
           emails.push(cleanValue);
         } else if (header.includes('phone')) {
           phones.push(cleanValue);
+        } else if (header.includes('birth')) {
+          // Try to parse various date formats
+          const date = new Date(cleanValue);
+          if (!isNaN(date.getTime())) {
+            contact.birthday = date;
+          }
         }
       });
 
-      if (contact.name) {
+      // Modified validation: Accept contact if it has either a name or at least one email
+      if (contact.name || emails.length > 0) {
         contact.emails = emails;
         contact.phones = phones;
+        // If no name is provided, use the first email as the name
+        if (!contact.name && emails.length > 0) {
+          contact.name = emails[0];
+        }
         contacts.push(contact);
       }
     }
