@@ -1,16 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SearchService } from '../services/search.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, FormsModule],
   template: `
     <nav class="nav-bar">
       <div class="nav-content">
         <div class="nav-brand">
           <a routerLink="/">People</a>
+        </div>
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input 
+            type="text" 
+            placeholder="Search contacts..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch($event)"
+          >
         </div>
         <div class="nav-items">
           <button *ngIf="deferredPrompt" class="install-btn" (click)="installApp()">
@@ -83,10 +94,39 @@ import { CommonModule } from '@angular/common';
       display: flex;
       align-items: center;
     }
+    .search-box {
+      flex: 1;
+      max-width: 400px;
+      margin: 0 20px;
+      position: relative;
+    }
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+    }
+    .search-box input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--background);
+      color: var(--text);
+      font-size: 14px;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
   `]
 })
 export class NavBarComponent implements OnInit {
+  searchTerm = '';
   deferredPrompt: any = null;
+
+  constructor(private searchService: SearchService) {}
 
   ngOnInit() {
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -108,5 +148,9 @@ export class NavBarComponent implements OnInit {
     
     // We no longer need the prompt
     this.deferredPrompt = null;
+  }
+
+  onSearch(term: string) {
+    this.searchService.updateSearchTerm(term);
   }
 }

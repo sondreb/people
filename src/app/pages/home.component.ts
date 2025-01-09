@@ -1,9 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Contact } from '../models/contact';
 import { StorageService } from '../services/storage.service';
 import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
+import { SearchService } from '../services/search.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +13,7 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
     <div class="page-container">
       <h1 class="page-title">People</h1>
       <div class="contacts-list">
-        <div *ngFor="let contact of contacts" class="contact-card">
+        <div *ngFor="let contact of filteredContacts" class="contact-card">
           <img [src]="contact.imageUrl || 'images/profile.png'" alt="Profile image" class="contact-image">
           <div class="contact-info">
             <h3>{{ contact.name }}</h3>
@@ -130,16 +132,39 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
   standalone: true,
   imports: [CommonModule, RouterModule, ConfirmDialogComponent],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   contacts: Contact[] = [];
+  filteredContacts: Contact[] = [];
+  private searchSubscription: Subscription;
   router = inject(Router);
   showDeleteDialog = false;
   contactToDelete: Contact | null = null;
 
-  constructor(private storage: StorageService) {}
+  constructor(
+    private storage: StorageService,
+    private searchService: SearchService
+  ) {
+    this.searchSubscription = this.searchService.searchTerm$.subscribe(term => {
+      this.filterContacts(term);
+    });
+  }
 
   async ngOnInit() {
     this.contacts = await this.storage.getAllContacts();
+    this.filteredContacts = [...this.contacts];
+  }
+
+  ngOnDestroy() {
+    this.searchSubscription.unsubscribe();
+  }
+
+  private filterContacts(term: string) {
+    term = term.toLowerCase();
+    this.filteredContacts = this.contacts.filter(contact =>
+      contact.name.toLowerCase().includes(term) ||
+      contact.emails?.some(email => email.toLowerCase().includes(term)) ||
+      contact.phones?.some(phone => phone.includes(term))
+    );
   }
 
   editContact(contact: Contact) {

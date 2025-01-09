@@ -45,7 +45,6 @@ The app defines routes for managing contacts and adding related information. The
 The app consists of the following components:
 
 - `ContactListComponent`: Displays the list of contacts
-- `AddContactComponent`: Displays the form to add a new contact
 - `EditContactComponent`: Displays the form to edit an existing contact
 
 ### Methods
