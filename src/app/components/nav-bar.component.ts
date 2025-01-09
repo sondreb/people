@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SearchService } from '../services/search.service';
 import { FormsModule } from '@angular/forms';
@@ -126,7 +126,10 @@ export class NavBarComponent implements OnInit {
   searchTerm = '';
   deferredPrompt: any = null;
 
-  constructor(private searchService: SearchService) {}
+  constructor(
+    private searchService: SearchService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -151,6 +154,11 @@ export class NavBarComponent implements OnInit {
   }
 
   onSearch(term: string) {
+    // Navigate to home if not already there
+    if (this.router.url !== '/') {
+      this.router.navigate(['/']);
+    }
+    
     this.searchService.updateSearchTerm(term);
   }
 }
