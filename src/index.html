@@ -14,7 +14,11 @@
     name="keywords"
     content="apps, desktop, web, mobile, people, management, productivity"
   />
-
+    <script>
+      // Initialize theme before rendering
+      const theme = localStorage.getItem('preferred-theme') || 'auto';
+      document.documentElement.dataset.theme = theme;
+    </script>
   <!--
   <meta property="og:title" content="People" />
   <meta property="og:description" content="Wonderful app to keep your people's information in one place" />

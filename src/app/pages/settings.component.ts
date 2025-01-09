@@ -1,17 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StorageService } from '../services/storage.service';
 import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
 import { Contact } from '../models/contact';
+import { ThemeService, Theme } from '../services/theme.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, ConfirmDialogComponent],
+  imports: [CommonModule, ConfirmDialogComponent, FormsModule],
   template: `
     <div class="page-container">
       <div class="settings-card">
         <h1>Settings</h1>
+
+        <div class="setting-group">
+          <h2>Theme</h2>
+          <div class="theme-selector">
+            <select [(ngModel)]="currentTheme" (ngModelChange)="onThemeChange($event)">
+              <option value="auto">Auto (System)</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
 
         <div class="setting-group">
           <h2>Data Management</h2>
@@ -119,16 +132,46 @@ import { Contact } from '../models/contact';
         font-size: 12px;
         color: var(--text-light);
       }
+      .theme-selector select {
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--card);
+        color: var(--text);
+        font-family: inherit;
+        font-size: 14px;
+        width: 200px;
+      }
+
+      .theme-selector select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
     `,
   ],
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
+  currentTheme: Theme = 'auto';
   showDialog = false;
   showImportDialog = false;
   importCount = 0;
   private contactsToImport: Contact[] = [];
 
-  constructor(private storage: StorageService) {}
+  constructor(
+    private storage: StorageService,
+    private themeService: ThemeService
+  ) {}
+
+  ngOnInit() {
+    this.themeService.getCurrentTheme().subscribe(theme => {
+      this.currentTheme = theme;
+    });
+  }
+
+  onThemeChange(theme: Theme) {
+    this.themeService.setTheme(theme);
+  }
 
   showDeleteConfirm() {
     this.showDialog = true;

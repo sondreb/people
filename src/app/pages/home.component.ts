@@ -12,18 +12,25 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-home',
   template: `
     <div class="page-container">
-      <h1 class="page-title">People</h1>
-      <div class="sort-controls">
-        <label>Sort by:</label>
-        <select [(ngModel)]="sortField" (change)="applySorting()">
-          <option value="name">Name</option>
-          <option value="birthday">Birthday</option>
-          <option value="company">Company</option>
-          <option value="email">Email</option>
-        </select>
-        <button (click)="toggleSortDirection()" class="sort-direction">
-          <i class="fas" [class.fa-sort-up]="sortAscending" [class.fa-sort-down]="!sortAscending"></i>
-        </button>
+      <div class="header-container">
+        <div class="title-section">
+          <h1 class="page-title">People</h1>
+          <span class="contact-count">
+            {{ filteredContacts.length }} {{ filteredContacts.length === contacts.length ? 'contacts' : 'results' }}
+          </span>
+        </div>
+        <div class="sort-controls">
+          <label>Sort by:</label>
+          <select [(ngModel)]="sortField" (change)="applySorting()">
+            <option value="name">Name</option>
+            <option value="birthday">Birthday</option>
+            <option value="company">Company</option>
+            <option value="email">Email</option>
+          </select>
+          <button (click)="toggleSortDirection()" class="sort-direction">
+            <i class="fas" [class.fa-sort-up]="sortAscending" [class.fa-sort-down]="!sortAscending"></i>
+          </button>
+        </div>
       </div>
       <div class="contacts-list">
         <div *ngFor="let contact of filteredContacts" class="contact-card">
@@ -78,11 +85,26 @@ import { FormsModule } from '@angular/forms';
       padding: 20px;
     }
 
-    .page-title {
-      font-size: 24px;
-      font-weight: 600;
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 24px;
-      color: var(--text);
+    }
+
+    .title-section {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .page-title {
+      margin: 0;
+    }
+
+    .contact-count {
+      color: var(--text-light);
+      font-size: 14px;
     }
 
     .sort-controls {
