@@ -230,13 +230,29 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   applySorting() {
+    // First filter out contacts that don't have the selected field
+    this.filteredContacts = this.filteredContacts.filter(contact => {
+      switch (this.sortField) {
+        case 'birthday':
+          return !!contact.birthday;
+        case 'company':
+          return !!contact.company;
+        case 'email':
+          return !!contact.emails?.length;
+        case 'name':
+          return true; // Always show contacts when sorting by name
+        default:
+          return true;
+      }
+    });
+
+    // Then sort the remaining contacts
     this.filteredContacts.sort((a, b) => {
       let valueA: any;
       let valueB: any;
 
       switch (this.sortField) {
         case 'birthday':
-          // Get month and day only for comparison
           if (a.birthday && b.birthday) {
             const dateA = new Date(0, a.birthday.getMonth(), a.birthday.getDate());
             const dateB = new Date(0, b.birthday.getMonth(), b.birthday.getDate());
