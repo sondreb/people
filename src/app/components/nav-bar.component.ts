@@ -38,7 +38,9 @@ import { FormsModule } from '@angular/forms';
   `,
   styles: [`
     .nav-bar {
-      background: var(--card);
+      background: rgba(var(--card-rgb), 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       box-shadow: var(--shadow);
       position: sticky;
       top: 0;

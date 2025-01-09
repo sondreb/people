@@ -1,21 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
+  --primary: #0ea5e9;
+  --primary-dark: #0284c7;
   --danger: #ef4444;
-  --success: #22c55e;
+  --success: #10b981;
   --background: #f8fafc;
   --card: #ffffff;
-  --text: #1e293b;
+  --card-rgb: 255, 255, 255;
+  --text: #0f172a;
   --text-light: #64748b;
   --border: #e2e8f0;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
 :root[data-theme="dark"] {
   --background: #0f172a;
   --card: #1e293b;
+  --card-rgb: 30, 41, 59;
   --text: #f1f5f9;
   --text-light: #94a3b8;
   --border: #334155;
