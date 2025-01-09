@@ -24,11 +24,13 @@ export class ThemeService {
   private setupMediaQueryListener() {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
-      document.documentElement.dataset['theme'] = 'auto';
+      if (this.themeSubject.value === 'auto') {
+        document.documentElement.dataset['theme'] = e.matches ? 'dark' : 'light';
+      }
     };
     
     mediaQuery.addEventListener('change', handleChange);
-    handleChange(mediaQuery);
+    handleChange(mediaQuery); // Initial check
   }
 
   private getStoredTheme(): Theme {
@@ -46,6 +48,11 @@ export class ThemeService {
   }
 
   private applyTheme(theme: Theme) {
-    document.documentElement.dataset['theme'] = theme;
+    if (theme === 'auto') {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset['theme'] = isDark ? 'dark' : 'light';
+    } else {
+      document.documentElement.dataset['theme'] = theme;
+    }
   }
 }
