@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1736463131603,
+  "timestamp": 1736535924104,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -28,6 +28,7 @@
       },
       "urls": [
         "/favicon.jpg",
+        "/icons/extended-icon.png",
         "/icons/icon-1024x1024.png",
         "/icons/icon-128x128.png",
         "/icons/icon-144x144.png",
@@ -37,6 +38,8 @@
         "/icons/icon-512x512.png",
         "/icons/icon-72x72.png",
         "/icons/icon-96x96.png",
+        "/icons/icon.png",
+        "/icons/people.png",
         "/images/profile.png"
       ],
       "patterns": []
@@ -45,15 +48,18 @@
   "dataGroups": [],
   "hashTable": {
     "/favicon.jpg": "df2534d9c6d72cc4f346c51da8d95c7b92869015",
+    "/icons/extended-icon.png": "6f4858ca136f6b11ed1ac4eb3b56489b4243d358",
     "/icons/icon-1024x1024.png": "b88a6a8faf8613ec9eaf49c5cf659b4180d1268f",
-    "/icons/icon-128x128.png": "e1408f186c6078a724f7de0753dd7c47ee17f959",
-    "/icons/icon-144x144.png": "d86aecf9eebb85ff14bd924e0b2e64a0bebfaf94",
-    "/icons/icon-152x152.png": "ea0826e95b2f33d7c3363a80278edde6208dbc0b",
-    "/icons/icon-192x192.png": "f9a28b19ff209eeb646264f2e623157e8cf7313c",
-    "/icons/icon-384x384.png": "52195086625dd459d988426e77e1bc44048498ef",
-    "/icons/icon-512x512.png": "d033b1431c4064d6a0df3608404c6808b2767ac0",
-    "/icons/icon-72x72.png": "5dd4d1dfa8279bd57b85e524103eb94c5c1365c0",
-    "/icons/icon-96x96.png": "57419478ee041642d8576d6b9e8c5e80e6a1ed64",
+    "/icons/icon-128x128.png": "587d1ab6f562dfe20c26cdf4763f0770afbf1308",
+    "/icons/icon-144x144.png": "234d4b5bc74b4a0a56472e66087a77ac72f6d4dd",
+    "/icons/icon-152x152.png": "04d31062e8eaf94c0114939a7c7f75671871a406",
+    "/icons/icon-192x192.png": "0d2a1933cc12980aaf9ce671bc0c959c786342f1",
+    "/icons/icon-384x384.png": "988a8499e00e1325556811a413f6580dbf9374b7",
+    "/icons/icon-512x512.png": "f535a2100898902d20be9879da0b8a08d78237a7",
+    "/icons/icon-72x72.png": "960dc8f5d91fc704f716d4f430b7747dfc3190aa",
+    "/icons/icon-96x96.png": "6524b79ede47d57b708b1f60268a6ba6d9db11b8",
+    "/icons/icon.png": "b9e4dd66035fe85940a74acb2d5a01ca06d4cf40",
+    "/icons/people.png": "47890913828fefc095aebba2d26f20bad28b8981",
     "/images/profile.png": "35f15a95e5fc7939121c71638a0cd8fe9830f7b6",
     "/index.html": "686ef4fe7769f3f05cca95cf2fe6310320cd8fcb",
     "/main-V5I4CDHX.js": "b5452a07b988c5fe1f953a0941d1b34b1ac3edbb",
