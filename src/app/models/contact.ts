@@ -81,6 +81,7 @@ export interface Contact {
   telex?: string;
   title?: string;
   webPage?: string;
+  avatarUrl?: string; // Add this property
 }
 
 const headerMapping: { [key: string]: keyof Contact } = {

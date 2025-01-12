@@ -8,6 +8,9 @@ import { SearchService } from '../services/search.service';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ContactCardComponent } from '../components/contact-card.component';
+import { ViewMode } from '../models/view-mode';
+import { AvatarViewComponent } from '../components/avatar-view.component';
+import { TableViewComponent } from '../components/table-view.component';
 
 @Component({
   selector: 'app-home',
@@ -20,18 +23,40 @@ import { ContactCardComponent } from '../components/contact-card.component';
             {{ filteredContacts.length }} {{ filteredContacts.length === contacts.length ? 'contacts' : 'results' }}
           </span>
         </div>
-        <div class="sort-controls">
-          <label>Sort by:</label>
+        <div class="view-controls">
+          <label>View:</label>
+          <select [(ngModel)]="currentViewMode" (ngModelChange)="onViewModeChange($event)">
+            <option [value]="ViewMode.Cards">Cards</option>
+            <option [value]="ViewMode.Avatars">Avatars</option>
+            <option [value]="ViewMode.Table">Table</option>
+          </select>
         </div>
       </div>
-      <div class="contacts-list">
-        <app-contact-card
-          *ngFor="let contact of filteredContacts"
-          [contact]="contact"
+
+      <ng-container [ngSwitch]="currentViewMode">
+        <div *ngSwitchCase="ViewMode.Cards" class="contacts-list">
+          <app-contact-card
+            *ngFor="let contact of filteredContacts"
+            [contact]="contact"
+            (onEdit)="editContact($event)"
+            (onDelete)="deleteContact($event)"
+          ></app-contact-card>
+        </div>
+
+        <app-avatar-view
+          *ngSwitchCase="ViewMode.Avatars"
+          [contacts]="filteredContacts"
+          (onEdit)="editContact($event)"
+        ></app-avatar-view>
+
+        <app-table-view
+          *ngSwitchCase="ViewMode.Table"
+          [contacts]="filteredContacts"
           (onEdit)="editContact($event)"
           (onDelete)="deleteContact($event)"
-        ></app-contact-card>
-      </div>
+        ></app-table-view>
+      </ng-container>
+
       <a routerLink="/contact" class="add-button">
         <i class="fas fa-plus square-icon"></i>
       </a>
@@ -173,9 +198,24 @@ import { ContactCardComponent } from '../components/contact-card.component';
     button i {
       font-size: 14px;
     }
+
+    .view-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .view-controls select {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--background);
+      color: var(--text);
+      font-size: 14px;
+    }
   `],
   standalone: true,
-  imports: [CommonModule, RouterModule, ConfirmDialogComponent, FormsModule, ContactCardComponent],
+  imports: [CommonModule, RouterModule, ConfirmDialogComponent, FormsModule, ContactCardComponent, AvatarViewComponent, TableViewComponent],
 })
 export class HomeComponent implements OnInit, OnDestroy {
   contacts: Contact[] = [];
@@ -186,6 +226,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   contactToDelete: Contact | null = null;
   sortField = 'name';
   sortAscending = true;
+  ViewMode = ViewMode; // Make enum available in template
+  currentViewMode: ViewMode = ViewMode.Cards;
 
   constructor(
     private storage: StorageService,
@@ -194,6 +236,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.searchSubscription = this.searchService.searchTerm$.subscribe(term => {
       this.filterContacts(term);
     });
+
+    // Load saved view mode preference
+    const savedViewMode = localStorage.getItem('preferredViewMode');
+    if (savedViewMode && Object.values(ViewMode).includes(savedViewMode as ViewMode)) {
+      this.currentViewMode = savedViewMode as ViewMode;
+    }
   }
 
   async ngOnInit() {
@@ -302,5 +350,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteDialog = false;
     this.contactToDelete = null;
+  }
+
+  onViewModeChange(viewMode: ViewMode) {
+    localStorage.setItem('preferredViewMode', viewMode);
   }
 }
