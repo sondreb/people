@@ -189,16 +189,129 @@ export class SettingsComponent implements OnInit {
 
   async exportData() {
     const contacts = await this.storage.getAllContacts();
-    const json = JSON.stringify(contacts, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
+    
+    // Define CSV headers
+    const headers = [
+      'First Name', 'Middle Name', 'Last Name', 'Title', 'Suffix', 'Nickname', 'Given Yomi', 'Surname Yomi',
+      'E-mail Address', 'E-mail 2 Address', 'E-mail 3 Address', 'Home Phone', 'Home Phone 2',
+      'Business Phone', 'Business Phone 2', 'Mobile Phone', 'Car Phone', 'Other Phone', 'Primary Phone',
+      'Pager', 'Business Fax', 'Home Fax', 'Other Fax', 'Company Main Phone', 'Callback', 'Radio Phone',
+      'Telex', 'TTY/TDD Phone', 'IMAddress', 'Job Title', 'Department', 'Company', 'Office Location',
+      'Manager\'s Name', 'Assistant\'s Name', 'Assistant\'s Phone', 'Company Yomi',
+      'Business Street', 'Business Street 2', 'Business Street 3', 'Business Address PO Box',
+      'Business City', 'Business State', 'Business Postal Code', 'Business Country', 'Business Country/Region',
+      'Home Street', 'Home Street 2', 'Home Street 3', 'Home Address PO Box',
+      'Home City', 'Home State', 'Home Postal Code', 'Home Country', 'Home Country/Region',
+      'Other Street', 'Other Street 2', 'Other Street 3', 'Other Address PO Box',
+      'Other City', 'Other State', 'Other Postal Code', 'Other Country', 'Other Country/Region',
+      'Personal Web Page', 'Spouse', 'Schools', 'Hobby', 'Location', 'Web Page',
+      'Birthday', 'Anniversary', 'Notes', 'Categories'
+    ].join(',') + '\n';
+  
+    // Convert contacts to CSV rows
+    const rows = contacts.map(contact => {
+      const fields = [
+        this.escapeCsvField(contact.firstName || ''),
+        '', // Middle Name
+        this.escapeCsvField(contact.lastName || ''),
+        '', // Title
+        '', // Suffix
+        '', // Nickname
+        '', // Given Yomi
+        '', // Surname Yomi
+        this.escapeCsvField(contact.emailAddress || ''),
+        '', // Email 2
+        '', // Email 3
+        '', // Home Phone
+        '', // Home Phone 2
+        '', // Business Phone
+        '', // Business Phone 2
+        this.escapeCsvField(contact.mobilePhone || ''),
+        '', // Car Phone
+        '', // Other Phone
+        '', // Primary Phone
+        '', // Pager
+        '', // Business Fax
+        '', // Home Fax
+        '', // Other Fax
+        '', // Company Main Phone
+        '', // Callback
+        '', // Radio Phone
+        '', // Telex
+        '', // TTY/TDD Phone
+        '', // IMAddress
+        '', // Job Title
+        '', // Department
+        this.escapeCsvField(contact.company || ''),
+        '', // Office Location
+        '', // Manager's Name
+        '', // Assistant's Name
+        '', // Assistant's Phone
+        '', // Company Yomi
+        this.escapeCsvField(contact.businessStreet || ''),
+        '', // Business Street 2
+        '', // Business Street 3
+        '', // Business Address PO Box
+        this.escapeCsvField(contact.businessCity || ''),
+        this.escapeCsvField(contact.businessState || ''),
+        this.escapeCsvField(contact.businessPostalCode || ''),
+        this.escapeCsvField(contact.businessCountry || ''),
+        '', // Business Country/Region
+        this.escapeCsvField(contact.homeStreet || ''),
+        '', // Home Street 2
+        '', // Home Street 3
+        '', // Home Address PO Box
+        this.escapeCsvField(contact.homeCity || ''),
+        this.escapeCsvField(contact.homeState || ''),
+        this.escapeCsvField(contact.homePostalCode || ''),
+        this.escapeCsvField(contact.homeCountry || ''),
+        '', // Home Country/Region
+        '', // Other Street
+        '', // Other Street 2
+        '', // Other Street 3
+        '', // Other Address PO Box
+        '', // Other City
+        '', // Other State
+        '', // Other Postal Code
+        '', // Other Country
+        '', // Other Country/Region
+        '', // Personal Web Page
+        '', // Spouse
+        '', // Schools
+        '', // Hobby
+        '', // Location
+        '', // Web Page
+        contact.birthday ? this.formatDate(contact.birthday) : '',
+        '', // Anniversary
+        this.escapeCsvField(contact.notes || ''),
+        this.escapeCsvField(contact.categories || '')
+      ];
+      return fields.join(',');
+    }).join('\n');
+  
+    const csv = headers + rows;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `contacts-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `contacts-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+  }
+  
+  private escapeCsvField(field: string): string {
+    if (!field) return '';
+    // If the field contains commas, quotes, or newlines, wrap it in quotes and escape existing quotes
+    if (field.includes('"') || field.includes(',') || field.includes('\n')) {
+      return `"${field.replace(/"/g, '""')}"`;
+    }
+    return field;
+  }
+  
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
   }
 
   async onFileSelected(event: Event) {
