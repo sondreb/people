@@ -9,6 +9,7 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StorageService } from '../services/storage.service';
+import { AvatarService } from '../services/avatar.service';
 
 @Component({
   selector: 'app-contact',
@@ -1151,7 +1152,8 @@ export class ContactComponent implements OnInit {
     private fb: FormBuilder,
     private storage: StorageService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private avatarService: AvatarService
   ) {
     this.contactForm = this.fb.group({
       firstName: ['', [Validators.required]],
@@ -1279,7 +1281,11 @@ export class ContactComponent implements OnInit {
       const contact = await this.storage.getContact(this.contactId);
       if (contact) {
         this.contactForm.patchValue(contact);
-        this.imagePreview = contact.imageUrl || null;
+        if (contact.imageUrl) {
+          this.imagePreview = contact.imageUrl;
+        } else {
+          this.imagePreview = await this.avatarService.getAvatarUrl(contact.emailAddress || '');
+        }
       }
     }
   }
@@ -1289,14 +1295,10 @@ export class ContactComponent implements OnInit {
       const formValue = this.contactForm.value;
       const contact = {
         ...formValue,
-        // HTML date inputs return YYYY-MM-DD format strings, so no conversion needed
         birthday: formValue.birthday || undefined,
         anniversary: formValue.anniversary || undefined,
-        emails:
-          formValue.emails?.filter((e: string) => e.trim().length > 0) || [],
-        phones:
-          formValue.phones?.filter((p: string) => p.trim().length > 0) || [],
-        imageUrl: this.imagePreview,
+        imageUrl: this.imageFile ? this.imagePreview : 
+          (formValue.imageUrl || this.avatarService.getAvatarUrl(formValue.emailAddress || '')),
       };
 
       if (this.isEditMode && this.contactId) {

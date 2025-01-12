@@ -7,6 +7,7 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
 import { SearchService } from '../services/search.service';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { ContactCardComponent } from '../components/contact-card.component';
 
 @Component({
   selector: 'app-home',
@@ -21,50 +22,15 @@ import { FormsModule } from '@angular/forms';
         </div>
         <div class="sort-controls">
           <label>Sort by:</label>
-          <!-- <select [(ngModel)]="sortField" (change)="applySorting()">
-            <option value="name">Name</option>
-            <option value="birthday">Birthday</option>
-            <option value="company">Company</option>
-            <option value="email">Email</option>
-          </select>
-          <button (click)="toggleSortDirection()" class="sort-direction">
-            <i class="fas" [class.fa-sort-up]="sortAscending" [class.fa-sort-down]="!sortAscending"></i>
-          </button> -->
         </div>
       </div>
       <div class="contacts-list">
-        <div *ngFor="let contact of filteredContacts" class="contact-card">
-          <img [src]="contact.imageUrl || 'images/profile.png'" alt="Profile image" class="contact-image">
-          <div class="contact-info">
-            <h3>{{ contact.firstName || (contact.emailAddress) || 'Unknown Contact' }}</h3>
-            <div *ngIf="contact.company" class="contact-company">
-              <i class="fas fa-building"></i>
-              <span>{{ contact.company }}</span>
-            </div>
-            <div class="contact-details">
-              <div *ngIf="contact.birthday" class="contact-detail">
-                <i class="fas fa-birthday-cake"></i>
-                <span>{{ contact.birthday | date:'mediumDate' }}</span>
-              </div>
-              <!-- <div *ngFor="let email of contact.emails" class="contact-detail">
-                <i class="fas fa-envelope"></i>
-                <span>{{ email }}</span>
-              </div>
-              <div *ngFor="let phone of contact.phones" class="contact-detail">
-                <i class="fas fa-phone"></i>
-                <span>{{ phone }}</span>
-              </div> -->
-            </div>
-          </div>
-          <div class="contact-actions">
-            <button class="edit-btn" (click)="editContact(contact)">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="delete-btn" (click)="deleteContact(contact)">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </div>
+        <app-contact-card
+          *ngFor="let contact of filteredContacts"
+          [contact]="contact"
+          (onEdit)="editContact($event)"
+          (onDelete)="deleteContact($event)"
+        ></app-contact-card>
       </div>
       <a routerLink="/contact" class="add-button">
         <i class="fas fa-plus square-icon"></i>
@@ -209,7 +175,7 @@ import { FormsModule } from '@angular/forms';
     }
   `],
   standalone: true,
-  imports: [CommonModule, RouterModule, ConfirmDialogComponent, FormsModule],
+  imports: [CommonModule, RouterModule, ConfirmDialogComponent, FormsModule, ContactCardComponent],
 })
 export class HomeComponent implements OnInit, OnDestroy {
   contacts: Contact[] = [];
