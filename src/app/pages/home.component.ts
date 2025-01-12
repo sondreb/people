@@ -17,7 +17,10 @@ import { ContactComponent } from './contact.component';
 @Component({
   selector: 'app-home',
   template: `
-    <app-split-view [showDetail]="selectedContactId !== null">
+    <app-split-view 
+      [showDetail]="selectedContactId !== null"
+      [contentId]="selectedContactId"
+    >
       <div master>
         <div class="page-container">
           <div class="header-container">

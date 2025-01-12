@@ -13,7 +13,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         <ng-content select="[master]"></ng-content>
       </div>
       <div class="detail-view" *ngIf="showDetail" [@detailState]="showDetail ? 'visible' : 'hidden'">
-        <ng-content select="[detail]"></ng-content>
+        <div [@contentState]="contentId">
+          <ng-content select="[detail]"></ng-content>
+        </div>
       </div>
     </div>
   `,
@@ -47,6 +49,20 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
       transition('visible => hidden', [
         animate('300ms cubic-bezier(0.4, 0.0, 0.2, 1)', 
           style({ transform: 'translateX(30%)', opacity: 0 }))
+      ])
+    ]),
+    trigger('contentState', [
+      transition('* => *', [
+        style({ 
+          transform: 'translateX(30px)',
+          opacity: 0
+        }),
+        animate('300ms cubic-bezier(0.4, 0.0, 0.2, 1)', 
+          style({ 
+            transform: 'translateX(0)',
+            opacity: 1
+          })
+        )
       ])
     ])
   ],
@@ -107,4 +123,5 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 })
 export class SplitViewComponent {
   @Input() showDetail = false;
+  @Input() contentId: any = null; // This will trigger the animation when it changes
 }
