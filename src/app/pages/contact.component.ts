@@ -14,13 +14,14 @@ import { StorageService } from '../services/storage.service';
   selector: 'app-contact',
   template: `
     <div class="page-container">
-    <div class="debug">
+      @if (contactForm.invalid) {
+      <div class="debug">
         <h3>Form Debug Info:</h3>
         <p>Form Valid: {{ contactForm.valid }}</p>
         <p>Form Touched: {{ contactForm.touched }}</p>
         <p>Form Dirty: {{ contactForm.dirty }}</p>
         <p>Form Errors: {{ contactForm.errors | json }}</p>
-        
+
         <h4>Form Controls Status:</h4>
         <div *ngFor="let control of getFormControls()">
           <p>{{ control.key }}:</p>
@@ -34,6 +35,7 @@ import { StorageService } from '../services/storage.service';
 
         <pre>{{ contactForm.value | json }}</pre>
       </div>
+      }
 
       <div class="form-card">
         <h2>{{ isEditMode ? 'Edit Contact' : 'Add New Contact' }}</h2>
@@ -471,27 +473,27 @@ import { StorageService } from '../services/storage.service';
                 <legend>Business Address</legend>
                 <div class="form-group">
                   <label for="businessStreet">Street</label>
-                  <input
+                  <textarea
                     id="businessStreet"
-                    type="text"
                     formControlName="businessStreet"
-                  />
+                    rows="3"
+                  ></textarea>
                 </div>
                 <div class="form-group">
                   <label for="businessStreet2">Street Line 2</label>
-                  <input
+                  <textarea
                     id="businessStreet2"
-                    type="text"
                     formControlName="businessStreet2"
-                  />
+                    rows="2"
+                  ></textarea>
                 </div>
                 <div class="form-group">
                   <label for="businessStreet3">Street Line 3</label>
-                  <input
+                  <textarea
                     id="businessStreet3"
-                    type="text"
                     formControlName="businessStreet3"
-                  />
+                    rows="2"
+                  ></textarea>
                 </div>
                 <div class="form-row">
                   <div class="form-group">
@@ -536,27 +538,27 @@ import { StorageService } from '../services/storage.service';
                 <legend>Home Address</legend>
                 <div class="form-group">
                   <label for="homeStreet">Street</label>
-                  <input
+                  <textarea
                     id="homeStreet"
-                    type="text"
                     formControlName="homeStreet"
-                  />
+                    rows="3"
+                  ></textarea>
                 </div>
                 <div class="form-group">
                   <label for="homeStreet2">Street Line 2</label>
-                  <input
+                  <textarea
                     id="homeStreet2"
-                    type="text"
                     formControlName="homeStreet2"
-                  />
+                    rows="2"
+                  ></textarea>
                 </div>
                 <div class="form-group">
                   <label for="homeStreet3">Street Line 3</label>
-                  <input
+                  <textarea
                     id="homeStreet3"
-                    type="text"
                     formControlName="homeStreet3"
-                  />
+                    rows="2"
+                  ></textarea>
                 </div>
                 <div class="form-row">
                   <div class="form-group">
@@ -627,27 +629,27 @@ import { StorageService } from '../services/storage.service';
                 </div>
                 <div class="form-group">
                   <label for="otherStreet">Street</label>
-                  <input
+                  <textarea
                     id="otherStreet"
-                    type="text"
                     formControlName="otherStreet"
-                  />
+                    rows="3"
+                  ></textarea>
                 </div>
                 <div class="form-group">
                   <label for="otherStreet2">Street Line 2</label>
-                  <input
+                  <textarea
                     id="otherStreet2"
-                    type="text"
                     formControlName="otherStreet2"
-                  />
+                    rows="2"
+                  ></textarea>
                 </div>
                 <div class="form-group">
                   <label for="otherStreet3">Street Line 3</label>
-                  <input
+                  <textarea
                     id="otherStreet3"
-                    type="text"
                     formControlName="otherStreet3"
-                  />
+                    rows="2"
+                  ></textarea>
                 </div>
                 <div class="form-row">
                   <div class="form-group">
@@ -825,10 +827,11 @@ import { StorageService } from '../services/storage.service';
   styles: [
     `
       .page-container {
-        max-width: 600px;
+        max-width: 1200px;  /* Increased from 600px */
+        width: 95%;         /* Added for responsive sizing */
         margin: 0 auto;
         padding: 20px;
-        padding-bottom: 80px; /* Add space for fixed buttons */
+        padding-bottom: 80px;
       }
 
       .form-card {
@@ -948,10 +951,12 @@ import { StorageService } from '../services/storage.service';
         display: flex;
         gap: 16px;
         margin-bottom: 16px;
+        flex-wrap: wrap;  /* Added for responsive layout */
       }
 
       .form-row .form-group {
         flex: 1;
+        min-width: 250px;  /* Added minimum width for better mobile layout */
       }
 
       .toggle-btn {
@@ -990,6 +995,15 @@ import { StorageService } from '../services/storage.service';
         border: 1px solid var(--border);
         border-radius: 4px;
         resize: vertical;
+        min-height: 38px;
+        font-family: inherit;
+        font-size: inherit;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
       }
 
       .advanced-fields {
@@ -1013,7 +1027,8 @@ import { StorageService } from '../services/storage.service';
       }
 
       .form-actions {
-        max-width: 600px;
+        max-width: 1200px;  /* Increased from 600px to match container */
+        width: 95%;         /* Added for responsive sizing */
         margin: 0 auto;
         display: flex;
         gap: 12px;
@@ -1048,6 +1063,75 @@ import { StorageService } from '../services/storage.service';
       input.invalid:focus {
         border-color: var(--danger);
         box-shadow: 0 0 0 2px rgba(var(--danger-rgb), 0.1);
+      }
+
+      /* Added responsive adjustments */
+      @media (max-width: 768px) {
+        .page-container {
+          padding: 10px;
+        }
+
+        .form-card {
+          padding: 16px;
+        }
+
+        fieldset {
+          padding: 12px;
+        }
+
+        .form-row {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .form-row .form-group {
+          min-width: 100%;
+        }
+
+        .form-actions {
+          padding: 12px;
+        }
+
+        .image-container {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+        }
+      }
+
+      /* Added larger screen optimizations */
+      @media (min-width: 1024px) {
+        fieldset {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 16px;
+          align-items: start;
+        }
+
+        fieldset > legend {
+          grid-column: 1 / -1;
+        }
+
+        fieldset > .form-row,
+        fieldset > .form-group {
+          margin: 0;
+        }
+      }
+
+      /* Improved form field aesthetics */
+      input, textarea, select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background-color: var(--card);
+        color: var(--text);
+        transition: all 0.2s ease;
+      }
+
+      input:hover, textarea:hover {
+        border-color: var(--primary);
       }
     `,
   ],
@@ -1172,9 +1256,9 @@ export class ContactComponent implements OnInit {
 
   getFormControls() {
     const controls = this.contactForm.controls;
-    return Object.keys(controls).map(key => ({
+    return Object.keys(controls).map((key) => ({
       key,
-      control: controls[key]
+      control: controls[key],
     }));
   }
 
