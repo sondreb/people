@@ -1,4 +1,12 @@
-import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -14,15 +22,16 @@ import { AvatarService } from '../services/avatar.service';
 @Component({
   selector: 'app-contact',
   template: `
-    <div class="page-container">
-      <div class="form-card">
-        <div class="header-actions">
-          <h2>{{ isEditMode ? 'Edit Contact' : 'Add New Contact' }}</h2>
-          <button class="close-btn" (click)="cancel()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+      <div class="page-container">
+        <div class="form-card">
+          <div class="header-actions">
+            <h2>{{ isEditMode ? 'Edit Contact' : 'Add New Contact' }}</h2>
+            <button class="close-btn" (click)="cancel()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
           <div class="form-content">
             <div class="image-upload">
               <div class="image-container">
@@ -66,13 +75,13 @@ import { AvatarService } from '../services/avatar.service';
                   </div>
                 </div>
                 <div class="form-group">
-                    <label for="middleName">Middle Name</label>
-                    <input
-                      id="middleName"
-                      type="text"
-                      formControlName="middleName"
-                    />
-                  </div>
+                  <label for="middleName">Middle Name</label>
+                  <input
+                    id="middleName"
+                    type="text"
+                    formControlName="middleName"
+                  />
+                </div>
                 <div class="form-group">
                   <label for="lastName">Last Name</label>
                   <input
@@ -176,7 +185,7 @@ import { AvatarService } from '../services/avatar.service';
                       formControlName="nickname"
                     />
                   </div>
-                
+
                   <div class="form-group">
                     <label for="suffix">Suffix</label>
                     <input id="suffix" type="text" formControlName="suffix" />
@@ -793,36 +802,52 @@ import { AvatarService } from '../services/avatar.service';
               </fieldset>
             </div>
           </div>
+        </div>
 
-          <div class="form-actions-wrapper">
-            <div class="form-actions">
-              <button type="button" class="cancel-btn" (click)="cancel()">
-                Cancel
-              </button>
-              <button type="submit" [disabled]="!contactForm.valid">
-                {{ isEditMode ? 'Update' : 'Add' }} Contact
-              </button>
-            </div>
+        <div class="form-actions-wrapper">
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" (click)="cancel()">
+              Cancel
+            </button>
+            <button type="submit" [disabled]="!contactForm.valid">
+              {{ isEditMode ? 'Update' : 'Add' }} Contact
+            </button>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
+    </form>
   `,
   styles: [
     `
       .page-container {
-        max-width: 1200px;  /* Increased from 600px */
-        width: 95%;         /* Added for responsive sizing */
-        margin: 0 auto;
-        padding: 20px;
+        max-width: 1200px;
         padding-bottom: 80px;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
       }
 
       .form-card {
         background: var(--card);
-        border-radius: 12px;
         padding: 24px;
-        box-shadow: var(--shadow);
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 140px;
+      }
+
+      .form-actions-wrapper {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--card);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        height: 60px;
+        background-color: #f5f5f5;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
       }
 
       h2 {
@@ -935,12 +960,12 @@ import { AvatarService } from '../services/avatar.service';
         display: flex;
         gap: 16px;
         margin-bottom: 16px;
-        flex-wrap: wrap;  /* Added for responsive layout */
+        flex-wrap: wrap; /* Added for responsive layout */
       }
 
       .form-row .form-group {
         flex: 1;
-        min-width: 250px;  /* Added minimum width for better mobile layout */
+        min-width: 250px; /* Added minimum width for better mobile layout */
       }
 
       .toggle-btn {
@@ -1000,19 +1025,9 @@ import { AvatarService } from '../services/avatar.service';
         margin-bottom: 16px;
       }
 
-      .form-actions-wrapper {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--card);
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        z-index: 100;
-      }
-
       .form-actions {
-        max-width: 1200px;  /* Increased from 600px to match container */
-        width: 95%;         /* Added for responsive sizing */
+        max-width: 1200px; /* Increased from 600px to match container */
+        width: 95%; /* Added for responsive sizing */
         margin: 0 auto;
         display: flex;
         gap: 12px;
@@ -1103,7 +1118,9 @@ import { AvatarService } from '../services/avatar.service';
       }
 
       /* Improved form field aesthetics */
-      input, textarea, select {
+      input,
+      textarea,
+      select {
         width: 100%;
         box-sizing: border-box;
         padding: 8px 12px;
@@ -1114,7 +1131,8 @@ import { AvatarService } from '../services/avatar.service';
         transition: all 0.2s ease;
       }
 
-      input:hover, textarea:hover {
+      input:hover,
+      textarea:hover {
         border-color: var(--primary);
       }
 
@@ -1289,7 +1307,9 @@ export class ContactComponent implements OnInit, OnChanges {
         if (contact.imageUrl) {
           this.imagePreview = contact.imageUrl;
         } else {
-          this.imagePreview = await this.avatarService.getAvatarUrl(contact.emailAddress || '');
+          this.imagePreview = await this.avatarService.getAvatarUrl(
+            contact.emailAddress || ''
+          );
         }
       }
     }
@@ -1310,7 +1330,9 @@ export class ContactComponent implements OnInit, OnChanges {
         if (contact.imageUrl) {
           this.imagePreview = contact.imageUrl;
         } else {
-          this.imagePreview = await this.avatarService.getAvatarUrl(contact.emailAddress || '');
+          this.imagePreview = await this.avatarService.getAvatarUrl(
+            contact.emailAddress || ''
+          );
         }
       }
     } else {
@@ -1326,8 +1348,10 @@ export class ContactComponent implements OnInit, OnChanges {
         ...formValue,
         birthday: formValue.birthday || undefined,
         anniversary: formValue.anniversary || undefined,
-        imageUrl: this.imageFile ? this.imagePreview : 
-          (formValue.imageUrl || this.avatarService.getAvatarUrl(formValue.emailAddress || '')),
+        imageUrl: this.imageFile
+          ? this.imagePreview
+          : formValue.imageUrl ||
+            this.avatarService.getAvatarUrl(formValue.emailAddress || ''),
       };
 
       if (this.isEditMode && this.contactId) {

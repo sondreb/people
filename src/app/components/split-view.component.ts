@@ -82,7 +82,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
     .detail-view {
       flex: 1;
-      overflow-y: auto;
+    //   overflow-y: auto;
       background: var(--background);
       border-left: 1px solid var(--border);
       will-change: transform, opacity;
