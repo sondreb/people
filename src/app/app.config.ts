@@ -4,6 +4,7 @@ import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
 import { isDevMode } from '@angular/core';
 import { ThemeService } from './services/theme.service';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export function initializeTheme(themeService: ThemeService) {
   return () => themeService.initialize();
@@ -21,6 +22,7 @@ export const appConfig: ApplicationConfig = {
       useFactory: initializeTheme,
       deps: [ThemeService],
       multi: true
-    }
+    },
+    provideAnimations()
   ]
 };
