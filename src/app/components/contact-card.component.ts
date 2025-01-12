@@ -17,11 +17,23 @@ import { AvatarService } from '../services/avatar.service';
         <h3 (click)="onEdit.emit(contact)" class="name-link">
           {{ getFullName() || contact.emailAddress || 'Unknown Contact' }}
         </h3>
-        <div *ngIf="contact.company" class="contact-company">
-          <i class="fas fa-building"></i>
-          <span>{{ contact.company }}</span>
-        </div>
         <div class="contact-details">
+          <div *ngIf="getPrimaryPhone()" class="contact-detail">
+            <i class="fas fa-phone"></i>
+            <a [href]="'tel:' + getPrimaryPhone()" class="contact-link">
+              {{ getPrimaryPhone() }}
+            </a>
+          </div>
+          <div *ngIf="contact.emailAddress" class="contact-detail">
+            <i class="fas fa-envelope"></i>
+            <a [href]="'mailto:' + contact.emailAddress" class="contact-link">
+              {{ contact.emailAddress }}
+            </a>
+          </div>
+          <div *ngIf="contact.company" class="contact-detail">
+            <i class="fas fa-building"></i>
+            <span>{{ contact.company }}</span>
+          </div>
           <div *ngIf="contact.birthday" class="contact-detail">
             <i class="fas fa-birthday-cake"></i>
             <span>{{ contact.birthday | date:'mediumDate' }}</span>
@@ -120,6 +132,17 @@ import { AvatarService } from '../services/avatar.service';
     .name-link:hover {
       color: var(--primary);
     }
+
+    .contact-link {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .contact-link:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
   `],
   standalone: true,
   imports: [CommonModule]
@@ -164,5 +187,13 @@ export class ContactCardComponent {
     if (this.contact.firstName) parts.push(this.contact.firstName);
     if (this.contact.lastName) parts.push(this.contact.lastName);
     return parts.join(' ') || 'Unknown';
+  }
+
+  getPrimaryPhone(): string | null {
+    return this.contact.mobilePhone || 
+           this.contact.primaryPhone || 
+           this.contact.businessPhone || 
+           this.contact.homePhone || 
+           null;
   }
 }
