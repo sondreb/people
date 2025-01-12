@@ -354,7 +354,6 @@ export class SettingsComponent implements OnInit {
   async confirmImport() {
     try {
       await this.storage.importContacts(this.contactsToImport);
-      debugger;
       this.showImportDialog = false;
       this.contactsToImport = [];
       window.location.reload();

@@ -227,6 +227,7 @@ export function parseCsvContacts(csvContent: string): Contact[] {
     if (values.length !== headers.length) continue;
 
     const contact: Partial<Contact> = {};
+    let hasValidData = false;
 
     headers.forEach((header, index) => {
       const value = values[index];
@@ -234,20 +235,32 @@ export function parseCsvContacts(csvContent: string): Contact[] {
 
       const cleanValue = value.replace(/^"(.*)"$/, '$1').replace(/""/g, '"');
 
+      // Skip empty or placeholder values from Outlook
+      if (cleanValue === '-' || cleanValue === 'N/A') return;
+
       if (header.includes('birth') || header.includes('anniversary')) {
-        // Store dates as ISO format strings YYYY-MM-DD
-        const dateStr = cleanValue.split('T')[0]; // Handle potential datetime strings
-        if (header.includes('birth')) contact.birthday = dateStr;
-        if (header.includes('anniversary')) contact.anniversary = dateStr;
+        const dateStr = cleanValue.split('T')[0];
+        if (header.includes('birth')) {
+          contact.birthday = dateStr;
+          hasValidData = true;
+        }
+        if (header.includes('anniversary')) {
+          contact.anniversary = dateStr;
+          hasValidData = true;
+        }
       } else {
         const mappedProperty = headerMapping[header];
         if (mappedProperty) {
           (contact as any)[mappedProperty] = cleanValue;
+          hasValidData = true;
         }
       }
     });
 
-    contacts.push(contact as Contact);
+    // Only add contact if it has valid data
+    if (hasValidData) {
+      contacts.push(contact as Contact);
+    }
   }
 
   return contacts;

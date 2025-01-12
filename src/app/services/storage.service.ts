@@ -105,17 +105,72 @@ export class StorageService {
 
   async importContacts(contacts: Contact[]): Promise<void> {
     await this.ensureDb();
-    const transaction = this.db!.transaction(this.storeName, 'readwrite');
-    const store = transaction.objectStore(this.storeName);
-
+    
+    // Get existing contacts first
+    const existingContacts = await this.getAllContacts();
+  
+    // Process all contacts first before starting transaction
+    const processedContacts = contacts.map(newContact => {
+      const existingContact = existingContacts.find(existing => 
+        this.isMatchingContact(existing, newContact)
+      );
+  
+      if (existingContact) {
+        return this.mergeContacts(existingContact, newContact);
+      }
+      return newContact;
+    });
+  
+    // Now handle the database transaction
     return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(this.storeName, 'readwrite');
+      const store = transaction.objectStore(this.storeName);
+  
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject(transaction.error);
-
-      contacts.forEach(contact => {
-        store.add(contact);
+  
+      // Process all contacts within the same transaction
+      processedContacts.forEach(contact => {
+        if (contact.id) {
+          store.put(contact);
+        } else {
+          store.add(contact);
+        }
       });
     });
+  }
+
+  private isMatchingContact(contact1: Contact, contact2: Contact): boolean {
+    // Match based on email address first
+    if (contact1.emailAddress && contact2.emailAddress && 
+        contact1.emailAddress.toLowerCase() === contact2.emailAddress.toLowerCase()) {
+      return true;
+    }
+
+    // Match based on name and phone number
+    if (contact1.firstName && contact2.firstName && 
+        contact1.lastName && contact2.lastName && 
+        contact1.mobilePhone && contact2.mobilePhone) {
+      return contact1.firstName.toLowerCase() === contact2.firstName.toLowerCase() &&
+             contact1.lastName.toLowerCase() === contact2.lastName.toLowerCase() &&
+             contact1.mobilePhone === contact2.mobilePhone;
+    }
+
+    return false;
+  }
+
+  private mergeContacts(existing: Contact, newContact: Contact): Contact {
+    const merged: any = { ...existing };
+    
+    // Iterate through all properties of the new contact
+    Object.keys(newContact).forEach(key => {
+      const prop = key as keyof Contact;
+      if (newContact[prop] && (!merged[prop] || merged[prop] === '')) {
+        merged[prop] = newContact[prop] as any as Contact[typeof prop];
+      }
+    });
+
+    return merged;
   }
 
   parseCsv(csvContent: string): Contact[] {
