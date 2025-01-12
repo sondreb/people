@@ -166,15 +166,64 @@ const headerMapping: { [key: string]: keyof Contact } = {
   'Web Page': 'webPage'
 };
 
+function parseCSVLine(line: string): string[] {
+  const values: string[] = [];
+  let currentValue = '';
+  let insideQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      if (insideQuotes && line[i + 1] === '"') {
+        // Handle escaped quotes
+        currentValue += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === ',' && !insideQuotes) {
+      values.push(currentValue.trim());
+      currentValue = '';
+    } else {
+      currentValue += char;
+    }
+  }
+  
+  values.push(currentValue.trim());
+  return values;
+}
+
 export function parseCsvContacts(csvContent: string): Contact[] {
-  const lines = csvContent.split('\n');
+  if (!csvContent) return [];
+
+  // Split into lines but preserve newlines within quoted fields
+  const lines: string[] = [];
+  let currentLine = '';
+  let insideQuotes = false;
+
+  csvContent.split('').forEach(char => {
+    if (char === '"') {
+      insideQuotes = !insideQuotes;
+      currentLine += char;
+    } else if (char === '\n' && !insideQuotes) {
+      lines.push(currentLine);
+      currentLine = '';
+    } else {
+      currentLine += char;
+    }
+  });
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
   if (lines.length < 2) return [];
 
-  const headers = lines[0].split(',').map(header => header.trim());
+  const headers = parseCSVLine(lines[0]);
   const contacts: Contact[] = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(value => value.trim());
+    const values = parseCSVLine(lines[i]);
     if (values.length !== headers.length) continue;
 
     const contact: Partial<Contact> = {};
@@ -182,8 +231,13 @@ export function parseCsvContacts(csvContent: string): Contact[] {
     headers.forEach((header, index) => {
       const mappedProperty = headerMapping[header];
       if (mappedProperty) {
-        const value = values[index];
+        let value = values[index];
         if (value) {
+          // Remove surrounding quotes if present
+          if (value.startsWith('"') && value.endsWith('"')) {
+            value = value.slice(1, -1).replace(/""/g, '"');
+          }
+          
           if (mappedProperty === 'anniversary' || mappedProperty === 'birthday') {
             contact[mappedProperty] = new Date(value);
           } else {
