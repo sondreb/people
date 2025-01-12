@@ -4,6 +4,7 @@
   --primary: #0ea5e9;
   --primary-dark: #0284c7;
   --danger: #ef4444;
+  --danger-rgb: 255,69,69;
   --success: #10b981;
   --background: #f8fafc;
   --card: #ffffff;
@@ -12,6 +13,8 @@
   --text-light: #64748b;
   --border: #e2e8f0;
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --secondary: #64748b;
+  --secondary-rgb: 100, 116, 139;
 }
 
 :root[data-theme="dark"] {
@@ -22,6 +25,8 @@
   --text-light: #94a3b8;
   --border: #334155;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  --secondary: #475569;
+  --secondary-rgb: 71, 85, 105;
 }
 
 html {
