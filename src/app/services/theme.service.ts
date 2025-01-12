@@ -43,12 +43,15 @@ export class ThemeService {
 
   private applyTheme(theme: Theme) {
     const root = document.documentElement;
+    const isDark = theme === 'dark' || (theme === 'auto' && this.mediaQuery.matches);
     
-    if (theme === 'auto') {
-      const isDark = this.mediaQuery.matches;
-      root.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    } else {
-      root.setAttribute('data-theme', theme);
+    root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    
+    // Update theme-color meta tag
+    const themeColor = isDark ? '#0f172a' : '#f8fafc';
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]:not([media])');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', themeColor);
     }
     
     this.theme.next(theme);
