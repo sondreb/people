@@ -21,7 +21,7 @@ import { FormsModule } from '@angular/forms';
         </div>
         <div class="sort-controls">
           <label>Sort by:</label>
-          <select [(ngModel)]="sortField" (change)="applySorting()">
+          <!-- <select [(ngModel)]="sortField" (change)="applySorting()">
             <option value="name">Name</option>
             <option value="birthday">Birthday</option>
             <option value="company">Company</option>
@@ -29,14 +29,14 @@ import { FormsModule } from '@angular/forms';
           </select>
           <button (click)="toggleSortDirection()" class="sort-direction">
             <i class="fas" [class.fa-sort-up]="sortAscending" [class.fa-sort-down]="!sortAscending"></i>
-          </button>
+          </button> -->
         </div>
       </div>
       <div class="contacts-list">
         <div *ngFor="let contact of filteredContacts" class="contact-card">
           <img [src]="contact.imageUrl || 'images/profile.png'" alt="Profile image" class="contact-image">
           <div class="contact-info">
-            <h3>{{ contact.name || (contact.emails && contact.emails[0]) || 'Unknown Contact' }}</h3>
+            <h3>{{ contact.firstName || (contact.emailAddress) || 'Unknown Contact' }}</h3>
             <div *ngIf="contact.company" class="contact-company">
               <i class="fas fa-building"></i>
               <span>{{ contact.company }}</span>
@@ -46,14 +46,14 @@ import { FormsModule } from '@angular/forms';
                 <i class="fas fa-birthday-cake"></i>
                 <span>{{ contact.birthday | date:'mediumDate' }}</span>
               </div>
-              <div *ngFor="let email of contact.emails" class="contact-detail">
+              <!-- <div *ngFor="let email of contact.emails" class="contact-detail">
                 <i class="fas fa-envelope"></i>
                 <span>{{ email }}</span>
               </div>
               <div *ngFor="let phone of contact.phones" class="contact-detail">
                 <i class="fas fa-phone"></i>
                 <span>{{ phone }}</span>
-              </div>
+              </div> -->
             </div>
           </div>
           <div class="contact-actions">
@@ -73,7 +73,7 @@ import { FormsModule } from '@angular/forms';
     <app-confirm-dialog
       [visible]="showDeleteDialog"
       title="Delete Contact"
-      [message]="'Are you sure you want to delete ' + (contactToDelete?.name || '') + '?'"
+      [message]="'Are you sure you want to delete ' + (contactToDelete?.firstName || '') + '?'"
       (confirm)="confirmDelete()"
       (cancel)="cancelDelete()"
     ></app-confirm-dialog>
@@ -226,88 +226,88 @@ export class HomeComponent implements OnInit, OnDestroy {
     private searchService: SearchService
   ) {
     this.searchSubscription = this.searchService.searchTerm$.subscribe(term => {
-      this.filterContacts(term);
+      // this.filterContacts(term);
     });
   }
 
   async ngOnInit() {
     this.contacts = await this.storage.getAllContacts();
     this.filteredContacts = [...this.contacts];
-    this.applySorting();
+    // this.applySorting();
   }
 
   ngOnDestroy() {
     this.searchSubscription.unsubscribe();
   }
 
-  private filterContacts(term: string) {
-    term = term.toLowerCase();
-    this.filteredContacts = this.contacts.filter(contact =>
-      contact.name.toLowerCase().includes(term) ||
-      contact.emails?.some(email => email.toLowerCase().includes(term)) ||
-      contact.phones?.some(phone => phone.includes(term)) ||
-      contact.company?.toLowerCase().includes(term)
-    );
-    this.applySorting();
-  }
+  // private filterContacts(term: string) {
+  //   term = term.toLowerCase();
+  //   this.filteredContacts = this.contacts.filter(contact =>
+  //     contact.name.toLowerCase().includes(term) ||
+  //     contact.emails?.some(email => email.toLowerCase().includes(term)) ||
+  //     contact.phones?.some(phone => phone.includes(term)) ||
+  //     contact.company?.toLowerCase().includes(term)
+  //   );
+  //   this.applySorting();
+  // }
 
-  applySorting() {
-    // Start with the current filtered results from the search term
-    this.filteredContacts = [...this.filteredContacts];
+  // applySorting() {
+  //   // Start with the current filtered results from the search term
+  //   this.filteredContacts = [...this.filteredContacts];
 
-    // Sort the contacts
-    this.filteredContacts.sort((a, b) => {
-      let valueA: any;
-      let valueB: any;
+  //   // Sort the contacts
+  //   this.filteredContacts.sort((a, b) => {
+  //     let valueA: any;
+  //     let valueB: any;
 
-      switch (this.sortField) {
-        case 'birthday':
-          // Sort nulls last
-          if (!a.birthday && !b.birthday) return 0;
-          if (!a.birthday) return 1;
-          if (!b.birthday) return -1;
+  //     switch (this.sortField) {
+  //       case 'birthday':
+  //         // Sort nulls last
+  //         if (!a.birthday && !b.birthday) return 0;
+  //         if (!a.birthday) return 1;
+  //         if (!b.birthday) return -1;
           
-          const dateA = new Date(0, a.birthday.getMonth(), a.birthday.getDate());
-          const dateB = new Date(0, b.birthday.getMonth(), b.birthday.getDate());
-          valueA = dateA.getTime();
-          valueB = dateB.getTime();
-          break;
-        case 'name':
-          valueA = a.name?.toLowerCase() || '';
-          valueB = b.name?.toLowerCase() || '';
-          break;
-        case 'company':
-          // Sort nulls last
-          if (!a.company && !b.company) return 0;
-          if (!a.company) return 1;
-          if (!b.company) return -1;
+  //         const dateA = new Date(0, a.birthday.getMonth(), a.birthday.getDate());
+  //         const dateB = new Date(0, b.birthday.getMonth(), b.birthday.getDate());
+  //         valueA = dateA.getTime();
+  //         valueB = dateB.getTime();
+  //         break;
+  //       case 'name':
+  //         valueA = a.name?.toLowerCase() || '';
+  //         valueB = b.name?.toLowerCase() || '';
+  //         break;
+  //       case 'company':
+  //         // Sort nulls last
+  //         if (!a.company && !b.company) return 0;
+  //         if (!a.company) return 1;
+  //         if (!b.company) return -1;
           
-          valueA = a.company.toLowerCase();
-          valueB = b.company.toLowerCase();
-          break;
-        case 'email':
-          // Sort nulls last
-          if (!a.emails?.length && !b.emails?.length) return 0;
-          if (!a.emails?.length) return 1;
-          if (!b.emails?.length) return -1;
+  //         valueA = a.company.toLowerCase();
+  //         valueB = b.company.toLowerCase();
+  //         break;
+  //       case 'email':
+  //         // Sort nulls last
+  //         if (!a.emails?.length && !b.emails?.length) return 0;
+  //         if (!a.emails?.length) return 1;
+  //         if (!b.emails?.length) return -1;
           
-          valueA = a.emails[0].toLowerCase();
-          valueB = b.emails[0].toLowerCase();
-          break;
-        default:
-          return 0;
-      }
+  //         valueA = a.emails[0].toLowerCase();
+  //         valueB = b.emails[0].toLowerCase();
+  //         break;
+  //       default:
+  //         return 0;
+  //     }
 
-      if (valueA < valueB) return this.sortAscending ? -1 : 1;
-      if (valueA > valueB) return this.sortAscending ? 1 : -1;
-      return 0;
-    });
-  }
+  //     if (valueA < valueB) return this.sortAscending ? -1 : 1;
+  //     if (valueA > valueB) return this.sortAscending ? 1 : -1;
+  //     return 0;
+  //   });
+  // }
 
-  toggleSortDirection() {
-    this.sortAscending = !this.sortAscending;
-    this.applySorting();
-  }
+  // toggleSortDirection() {
+  //   this.sortAscending = !this.sortAscending;
+  //   this.applySorting();
+  // }
 
   editContact(contact: Contact) {
     this.router.navigate(['/contact', contact.id]);

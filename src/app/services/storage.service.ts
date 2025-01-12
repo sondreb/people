@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Contact } from '../models/contact';
+import { Contact, parseCsvContacts } from '../models/contact';
 
 @Injectable({
   providedIn: 'root'
@@ -118,107 +118,110 @@ export class StorageService {
     });
   }
 
-  parseCsvContacts(csvContent: string): Contact[] {
-    const parseCSVLine = (line: string): string[] => {
-      const result: string[] = [];
-      let field = '';
-      let insideQuotes = false;
+  parseCsv(csvContent: string): Contact[] {
+
+    return parseCsvContacts(csvContent);
+    
+    // const parseCSVLine = (line: string): string[] => {
+    //   const result: string[] = [];
+    //   let field = '';
+    //   let insideQuotes = false;
       
-      for (let i = 0; i < line.length; i++) {
-        const char = line[i];
+    //   for (let i = 0; i < line.length; i++) {
+    //     const char = line[i];
         
-        if (char === '"') {
-          if (i + 1 < line.length && line[i + 1] === '"') {
-            // Handle escaped quotes
-            field += '"';
-            i++; // Skip next quote
-          } else {
-            insideQuotes = !insideQuotes;
-          }
-        } else if (char === ',' && !insideQuotes) {
-          result.push(field.trim());
-          field = '';
-        } else {
-          field += char;
-        }
-      }
+    //     if (char === '"') {
+    //       if (i + 1 < line.length && line[i + 1] === '"') {
+    //         // Handle escaped quotes
+    //         field += '"';
+    //         i++; // Skip next quote
+    //       } else {
+    //         insideQuotes = !insideQuotes;
+    //       }
+    //     } else if (char === ',' && !insideQuotes) {
+    //       result.push(field.trim());
+    //       field = '';
+    //     } else {
+    //       field += char;
+    //     }
+    //   }
       
-      result.push(field.trim());
-      return result;
-    };
+    //   result.push(field.trim());
+    //   return result;
+    // };
 
     // Split content into lines while preserving newlines in quoted fields
-    const lines: string[] = [];
-    let currentLine = '';
-    let insideQuotes = false;
+    // const lines: string[] = [];
+    // let currentLine = '';
+    // let insideQuotes = false;
     
-    for (let i = 0; i < csvContent.length; i++) {
-      const char = csvContent[i];
+    // for (let i = 0; i < csvContent.length; i++) {
+    //   const char = csvContent[i];
       
-      if (char === '"') {
-        insideQuotes = !insideQuotes;
-        currentLine += char;
-      } else if (char === '\n' && !insideQuotes) {
-        lines.push(currentLine); // Remove the trim() check here
-        currentLine = '';
-      } else {
-        currentLine += char;
-      }
-    }
-    if (currentLine) { // Remove trim() check here as well
-      lines.push(currentLine);
-    }
+    //   if (char === '"') {
+    //     insideQuotes = !insideQuotes;
+    //     currentLine += char;
+    //   } else if (char === '\n' && !insideQuotes) {
+    //     lines.push(currentLine); // Remove the trim() check here
+    //     currentLine = '';
+    //   } else {
+    //     currentLine += char;
+    //   }
+    // }
+    // if (currentLine) { // Remove trim() check here as well
+    //   lines.push(currentLine);
+    // }
 
-    // Parse headers and create contacts
-    const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
-    const contacts: Contact[] = [];
+    // // Parse headers and create contacts
+    // const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
+    // const contacts: Contact[] = [];
 
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
-      if (!line) continue; // Skip truly empty lines, but keep lines with just commas
+    // for (let i = 1; i < lines.length; i++) {
+    //   const line = lines[i];
+    //   if (!line) continue; // Skip truly empty lines, but keep lines with just commas
       
-      const values = parseCSVLine(lines[i]);
-      const contact: Contact = { name: '' };
-      const emails: string[] = [];
-      const phones: string[] = [];
+    //   const values = parseCSVLine(lines[i]);
+    //   const contact: Contact = { name: '' };
+    //   const emails: string[] = [];
+    //   const phones: string[] = [];
 
-      headers.forEach((header, index) => {
-        const value = values[index];
-        if (!value) return;
+    //   headers.forEach((header, index) => {
+    //     const value = values[index];
+    //     if (!value) return;
 
-        // Remove surrounding quotes if they exist
-        const cleanValue = value.replace(/^"(.*)"$/, '$1').replace(/""/g, '"');
+    //     // Remove surrounding quotes if they exist
+    //     const cleanValue = value.replace(/^"(.*)"$/, '$1').replace(/""/g, '"');
 
-        if (header.includes('name')) {
-          contact.name = cleanValue;
-        } else if (header.includes('company')) {
-          contact.company = cleanValue;
-        } else if (header.includes('email')) {
-          emails.push(cleanValue);
-        } else if (header.includes('phone')) {
-          phones.push(cleanValue);
-        } else if (header.includes('birth')) {
-          // Try to parse various date formats
-          const date = new Date(cleanValue);
-          if (!isNaN(date.getTime())) {
-            contact.birthday = date;
-          }
-        }
-      });
+    //     if (header.includes('name')) {
+    //       contact.name = cleanValue;
+    //     } else if (header.includes('company')) {
+    //       contact.company = cleanValue;
+    //     } else if (header.includes('email')) {
+    //       emails.push(cleanValue);
+    //     } else if (header.includes('phone')) {
+    //       phones.push(cleanValue);
+    //     } else if (header.includes('birth')) {
+    //       // Try to parse various date formats
+    //       const date = new Date(cleanValue);
+    //       if (!isNaN(date.getTime())) {
+    //         contact.birthday = date;
+    //       }
+    //     }
+    //   });
 
-      // Modified validation: Accept contact if it has either a name or at least one email
-      if (contact.name || emails.length > 0) {
-        contact.emails = emails;
-        contact.phones = phones;
-        // If no name is provided, use the first email as the name
-        if (!contact.name && emails.length > 0) {
-          contact.name = emails[0];
-        }
-        contacts.push(contact);
-      }
-    }
+    //   // Modified validation: Accept contact if it has either a name or at least one email
+    //   if (contact.name || emails.length > 0) {
+    //     contact.emails = emails;
+    //     contact.phones = phones;
+    //     // If no name is provided, use the first email as the name
+    //     if (!contact.name && emails.length > 0) {
+    //       contact.name = emails[0];
+    //     }
+    //     contacts.push(contact);
+    //   }
+    // }
 
-    return contacts;
+    // return contacts;
   }
 
   private async ensureDb(): Promise<void> {

@@ -210,7 +210,7 @@ export class SettingsComponent implements OnInit {
       if (file.name.endsWith('.json')) {
         this.contactsToImport = JSON.parse(content);
       } else if (file.name.endsWith('.csv')) {
-        this.contactsToImport = this.storage.parseCsvContacts(content);
+        this.contactsToImport = this.storage.parseCsv(content);
       }
 
       if (this.contactsToImport.length > 0) {
