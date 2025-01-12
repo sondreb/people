@@ -11,56 +11,70 @@ import { ContactCardComponent } from '../components/contact-card.component';
 import { ViewMode } from '../models/view-mode';
 import { AvatarViewComponent } from '../components/avatar-view.component';
 import { TableViewComponent } from '../components/table-view.component';
+import { SplitViewComponent } from '../components/split-view.component';
+import { ContactComponent } from './contact.component';
 
 @Component({
   selector: 'app-home',
   template: `
-    <div class="page-container">
-      <div class="header-container">
-        <div class="title-section">
-          <h1 class="page-title">People</h1>
-          <span class="contact-count">
-            {{ filteredContacts.length }} {{ filteredContacts.length === contacts.length ? 'contacts' : 'results' }}
-          </span>
-        </div>
-        <div class="view-controls">
-          <label>View:</label>
-          <select [(ngModel)]="currentViewMode" (ngModelChange)="onViewModeChange($event)">
-            <option [value]="ViewMode.Cards">Cards</option>
-            <option [value]="ViewMode.Avatars">Avatars</option>
-            <option [value]="ViewMode.Table">Table</option>
-          </select>
+    <app-split-view [showDetail]="selectedContactId !== null">
+      <div master>
+        <div class="page-container">
+          <div class="header-container">
+            <div class="title-section">
+              <h1 class="page-title">People</h1>
+              <span class="contact-count">
+                {{ filteredContacts.length }} {{ filteredContacts.length === contacts.length ? 'contacts' : 'results' }}
+              </span>
+            </div>
+            <div class="view-controls">
+              <label>View:</label>
+              <select [(ngModel)]="currentViewMode" (ngModelChange)="onViewModeChange($event)">
+                <option [value]="ViewMode.Cards">Cards</option>
+                <option [value]="ViewMode.Avatars">Avatars</option>
+                <option [value]="ViewMode.Table">Table</option>
+              </select>
+            </div>
+          </div>
+
+          <ng-container [ngSwitch]="currentViewMode">
+            <div *ngSwitchCase="ViewMode.Cards" class="contacts-list">
+              <app-contact-card
+                *ngFor="let contact of filteredContacts"
+                [contact]="contact"
+                (onEdit)="editContact($event)"
+                (onDelete)="deleteContact($event)"
+              ></app-contact-card>
+            </div>
+
+            <app-avatar-view
+              *ngSwitchCase="ViewMode.Avatars"
+              [contacts]="filteredContacts"
+              (onEdit)="editContact($event)"
+            ></app-avatar-view>
+
+            <app-table-view
+              *ngSwitchCase="ViewMode.Table"
+              [contacts]="filteredContacts"
+              (onEdit)="editContact($event)"
+              (onDelete)="deleteContact($event)"
+            ></app-table-view>
+          </ng-container>
+
+          <a routerLink="/contact" class="add-button">
+            <i class="fas fa-plus square-icon"></i>
+          </a>
         </div>
       </div>
 
-      <ng-container [ngSwitch]="currentViewMode">
-        <div *ngSwitchCase="ViewMode.Cards" class="contacts-list">
-          <app-contact-card
-            *ngFor="let contact of filteredContacts"
-            [contact]="contact"
-            (onEdit)="editContact($event)"
-            (onDelete)="deleteContact($event)"
-          ></app-contact-card>
-        </div>
-
-        <app-avatar-view
-          *ngSwitchCase="ViewMode.Avatars"
-          [contacts]="filteredContacts"
-          (onEdit)="editContact($event)"
-        ></app-avatar-view>
-
-        <app-table-view
-          *ngSwitchCase="ViewMode.Table"
-          [contacts]="filteredContacts"
-          (onEdit)="editContact($event)"
-          (onDelete)="deleteContact($event)"
-        ></app-table-view>
-      </ng-container>
-
-      <a routerLink="/contact" class="add-button">
-        <i class="fas fa-plus square-icon"></i>
-      </a>
-    </div>
+      <div detail *ngIf="selectedContactId !== null">
+        <app-contact 
+          [contactId]="selectedContactId"
+          (close)="closeContact()"
+          (saved)="onContactSaved()"
+        ></app-contact>
+      </div>
+    </app-split-view>
     <app-confirm-dialog
       [visible]="showDeleteDialog"
       title="Delete Contact"
@@ -215,7 +229,7 @@ import { TableViewComponent } from '../components/table-view.component';
     }
   `],
   standalone: true,
-  imports: [CommonModule, RouterModule, ConfirmDialogComponent, FormsModule, ContactCardComponent, AvatarViewComponent, TableViewComponent],
+  imports: [CommonModule, RouterModule, ConfirmDialogComponent, FormsModule, ContactCardComponent, AvatarViewComponent, TableViewComponent, SplitViewComponent, ContactComponent],
 })
 export class HomeComponent implements OnInit, OnDestroy {
   contacts: Contact[] = [];
@@ -228,6 +242,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   sortAscending = true;
   ViewMode = ViewMode; // Make enum available in template
   currentViewMode: ViewMode = ViewMode.Cards;
+  selectedContactId: number | null = null;
 
   constructor(
     private storage: StorageService,
@@ -328,7 +343,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   editContact(contact: Contact) {
-    this.router.navigate(['/contact', contact.id]);
+    this.selectedContactId = contact.id!;
+  }
+
+  closeContact() {
+    this.selectedContactId = null;
+  }
+
+  onContactSaved() {
+    this.selectedContactId = null;
+    // Refresh the contact list
+    this.ngOnInit();
   }
 
   deleteContact(contact: Contact) {

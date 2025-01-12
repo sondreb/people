@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Input, Output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -15,31 +15,13 @@ import { AvatarService } from '../services/avatar.service';
   selector: 'app-contact',
   template: `
     <div class="page-container">
-      @if (contactForm.invalid) {
-      <div class="debug">
-        <h3>Form Debug Info:</h3>
-        <p>Form Valid: {{ contactForm.valid }}</p>
-        <p>Form Touched: {{ contactForm.touched }}</p>
-        <p>Form Dirty: {{ contactForm.dirty }}</p>
-        <p>Form Errors: {{ contactForm.errors | json }}</p>
-
-        <h4>Form Controls Status:</h4>
-        <div *ngFor="let control of getFormControls()">
-          <p>{{ control.key }}:</p>
-          <ul>
-            <li>Valid: {{ contactForm.get(control.key)?.valid }}</li>
-            <li>Touched: {{ contactForm.get(control.key)?.touched }}</li>
-            <li>Dirty: {{ contactForm.get(control.key)?.dirty }}</li>
-            <li>Errors: {{ contactForm.get(control.key)?.errors | json }}</li>
-          </ul>
-        </div>
-
-        <pre>{{ contactForm.value | json }}</pre>
-      </div>
-      }
-
       <div class="form-card">
-        <h2>{{ isEditMode ? 'Edit Contact' : 'Add New Contact' }}</h2>
+        <div class="header-actions">
+          <h2>{{ isEditMode ? 'Edit Contact' : 'Add New Contact' }}</h2>
+          <button class="close-btn" (click)="cancel()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
         <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
           <div class="form-content">
             <div class="image-upload">
@@ -1135,15 +1117,38 @@ import { AvatarService } from '../services/avatar.service';
       input:hover, textarea:hover {
         border-color: var(--primary);
       }
+
+      .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: var(--text-light);
+        cursor: pointer;
+        padding: 8px;
+      }
+
+      .close-btn:hover {
+        color: var(--text);
+      }
     `,
   ],
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
 })
-export class ContactComponent implements OnInit {
+export class ContactComponent implements OnInit, OnChanges {
+  @Input() contactId?: number;
+  @Output() close = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<void>();
+
   contactForm: FormGroup;
   isEditMode = false;
-  contactId?: number;
   imagePreview: string | null = null;
   private imageFile: File | null = null;
   showAdvancedFields = false;
@@ -1290,6 +1295,30 @@ export class ContactComponent implements OnInit {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['contactId']) {
+      this.loadContact();
+    }
+  }
+
+  async loadContact() {
+    if (this.contactId) {
+      this.isEditMode = true;
+      const contact = await this.storage.getContact(this.contactId);
+      if (contact) {
+        this.contactForm.patchValue(contact);
+        if (contact.imageUrl) {
+          this.imagePreview = contact.imageUrl;
+        } else {
+          this.imagePreview = await this.avatarService.getAvatarUrl(contact.emailAddress || '');
+        }
+      }
+    } else {
+      this.isEditMode = false;
+      this.contactForm.reset();
+    }
+  }
+
   async onSubmit() {
     if (this.contactForm.valid) {
       const formValue = this.contactForm.value;
@@ -1307,12 +1336,12 @@ export class ContactComponent implements OnInit {
       } else {
         await this.storage.addContact(contact);
       }
-      this.router.navigate(['']);
+      this.saved.emit();
     }
   }
 
   cancel() {
-    this.router.navigate(['']);
+    this.close.emit();
   }
 
   isFieldInvalid(fieldName: string): boolean {
