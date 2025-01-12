@@ -12,7 +12,10 @@ import { FormsModule } from '@angular/forms';
     <nav class="nav-bar">
       <div class="nav-content">
         <div class="nav-brand">
-          <a routerLink="/">People</a>
+          <a routerLink="/">
+            <img src="icons/icon-72x72.png" alt="People App Icon" class="nav-icon">
+            <span>People</span>
+          </a>
         </div>
         <div class="search-box">
           <i class="fas fa-search"></i>
@@ -55,11 +58,22 @@ import { FormsModule } from '@angular/forms';
       justify-content: space-between;
       align-items: center;
     }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+    }
     .nav-brand a {
       font-size: 20px;
       font-weight: 600;
       color: var(--text);
       text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-icon {
+      width: 32px;
+      height: 32px;
     }
     .nav-items a {
       color: var(--text-light);
