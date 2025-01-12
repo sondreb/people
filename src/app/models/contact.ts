@@ -1,10 +1,10 @@
 export interface Contact {
   id?: number;
   imageUrl?: string;
-  anniversary?: Date;
+  anniversary?: string; // Changed from Date to string - will store ISO format YYYY-MM-DD
   assistantName?: string;
   assistantPhone?: string;
-  birthday?: Date;
+  birthday?: string; // Changed from Date to string - will store ISO format YYYY-MM-DD
   businessAddress?: string;
   businessAddressPOBox?: string;
   businessCity?: string;
@@ -229,20 +229,20 @@ export function parseCsvContacts(csvContent: string): Contact[] {
     const contact: Partial<Contact> = {};
 
     headers.forEach((header, index) => {
-      const mappedProperty = headerMapping[header];
-      if (mappedProperty) {
-        let value = values[index];
-        if (value) {
-          // Remove surrounding quotes if present
-          if (value.startsWith('"') && value.endsWith('"')) {
-            value = value.slice(1, -1).replace(/""/g, '"');
-          }
-          
-          if (mappedProperty === 'anniversary' || mappedProperty === 'birthday') {
-            contact[mappedProperty] = new Date(value);
-          } else {
-            (contact as any)[mappedProperty] = value;
-          }
+      const value = values[index];
+      if (!value) return;
+
+      const cleanValue = value.replace(/^"(.*)"$/, '$1').replace(/""/g, '"');
+
+      if (header.includes('birth') || header.includes('anniversary')) {
+        // Store dates as ISO format strings YYYY-MM-DD
+        const dateStr = cleanValue.split('T')[0]; // Handle potential datetime strings
+        if (header.includes('birth')) contact.birthday = dateStr;
+        if (header.includes('anniversary')) contact.anniversary = dateStr;
+      } else {
+        const mappedProperty = headerMapping[header];
+        if (mappedProperty) {
+          (contact as any)[mappedProperty] = cleanValue;
         }
       }
     });

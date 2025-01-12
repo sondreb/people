@@ -281,7 +281,8 @@ export class SettingsComponent implements OnInit {
         '', // Hobby
         '', // Location
         '', // Web Page
-        contact.birthday ? this.formatDate(contact.birthday) : '',
+        '', // Birthday
+        //contact.birthday ? this.formatDate(contact.birthday) : '',
         '', // Anniversary
         this.escapeCsvField(contact.notes || ''),
         this.escapeCsvField(contact.categories || '')
