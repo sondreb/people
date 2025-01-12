@@ -153,7 +153,13 @@ import { StorageService } from '../services/storage.service';
                 <legend>Additional Contact Information</legend>
                 <div class="form-group">
                   <label for="webPage">Web Page</label>
-                  <input id="webPage" type="url" formControlName="webPage">
+                  <input id="webPage" 
+                         type="url" 
+                         formControlName="webPage"
+                         [class.invalid]="isFieldInvalid('webPage')">
+                  <div class="error-message" *ngIf="isFieldInvalid('webPage')">
+                    Please enter a valid web address (e.g., https://example.com)
+                  </div>
                 </div>
                 <div class="form-group">
                   <label for="notes">Notes</label>
