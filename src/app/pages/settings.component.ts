@@ -290,7 +290,15 @@ export class SettingsComponent implements OnInit {
     }).join('\n');
   
     const csv = headers + rows;
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    
+    // Add UTF-8 BOM
+    const BOM = '\uFEFF';
+    const csvWithBOM = BOM + csv;
+    
+    const blob = new Blob([csvWithBOM], { 
+      type: 'text/csv;charset=utf-8;'
+    });
+    
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
