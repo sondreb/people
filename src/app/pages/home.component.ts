@@ -192,7 +192,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private searchService: SearchService
   ) {
     this.searchSubscription = this.searchService.searchTerm$.subscribe(term => {
-      // this.filterContacts(term);
+      this.filterContacts(term);
     });
   }
 
@@ -206,74 +206,78 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.searchSubscription.unsubscribe();
   }
 
-  // private filterContacts(term: string) {
-  //   term = term.toLowerCase();
-  //   this.filteredContacts = this.contacts.filter(contact =>
-  //     contact.name.toLowerCase().includes(term) ||
-  //     contact.emails?.some(email => email.toLowerCase().includes(term)) ||
-  //     contact.phones?.some(phone => phone.includes(term)) ||
-  //     contact.company?.toLowerCase().includes(term)
-  //   );
-  //   this.applySorting();
-  // }
+  private filterContacts(term: string) {
+    term = term.toLowerCase().trim();
 
-  // applySorting() {
-  //   // Start with the current filtered results from the search term
-  //   this.filteredContacts = [...this.filteredContacts];
+    if (!term) {
+      this.filteredContacts = [...this.contacts];
+      return;
+    }
 
-  //   // Sort the contacts
-  //   this.filteredContacts.sort((a, b) => {
-  //     let valueA: any;
-  //     let valueB: any;
+    this.filteredContacts = this.contacts.filter(contact => {
+      // Helper function to check if a value contains the search term
+      const matchesTerm = (value: any) => {
+        if (!value) return false;
+        return String(value).toLowerCase().includes(term);
+      };
 
-  //     switch (this.sortField) {
-  //       case 'birthday':
-  //         // Sort nulls last
-  //         if (!a.birthday && !b.birthday) return 0;
-  //         if (!a.birthday) return 1;
-  //         if (!b.birthday) return -1;
-          
-  //         const dateA = new Date(0, a.birthday.getMonth(), a.birthday.getDate());
-  //         const dateB = new Date(0, b.birthday.getMonth(), b.birthday.getDate());
-  //         valueA = dateA.getTime();
-  //         valueB = dateB.getTime();
-  //         break;
-  //       case 'name':
-  //         valueA = a.name?.toLowerCase() || '';
-  //         valueB = b.name?.toLowerCase() || '';
-  //         break;
-  //       case 'company':
-  //         // Sort nulls last
-  //         if (!a.company && !b.company) return 0;
-  //         if (!a.company) return 1;
-  //         if (!b.company) return -1;
-          
-  //         valueA = a.company.toLowerCase();
-  //         valueB = b.company.toLowerCase();
-  //         break;
-  //       case 'email':
-  //         // Sort nulls last
-  //         if (!a.emails?.length && !b.emails?.length) return 0;
-  //         if (!a.emails?.length) return 1;
-  //         if (!b.emails?.length) return -1;
-          
-  //         valueA = a.emails[0].toLowerCase();
-  //         valueB = b.emails[0].toLowerCase();
-  //         break;
-  //       default:
-  //         return 0;
-  //     }
+      // Check name fields
+      if (matchesTerm(contact.firstName) || 
+          matchesTerm(contact.middleName) || 
+          matchesTerm(contact.lastName) ||
+          matchesTerm(contact.nickname)) {
+        return true;
+      }
 
-  //     if (valueA < valueB) return this.sortAscending ? -1 : 1;
-  //     if (valueA > valueB) return this.sortAscending ? 1 : -1;
-  //     return 0;
-  //   });
-  // }
+      // Check email addresses
+      if (matchesTerm(contact.emailAddress) || 
+          matchesTerm(contact.email2Address) || 
+          matchesTerm(contact.email3Address)) {
+        return true;
+      }
 
-  // toggleSortDirection() {
-  //   this.sortAscending = !this.sortAscending;
-  //   this.applySorting();
-  // }
+      // Check phone numbers
+      if (matchesTerm(contact.mobilePhone) ||
+          matchesTerm(contact.homePhone) ||
+          matchesTerm(contact.businessPhone) ||
+          matchesTerm(contact.primaryPhone)) {
+        return true;
+      }
+
+      // Check company related fields
+      if (matchesTerm(contact.company) ||
+          matchesTerm(contact.jobTitle) ||
+          matchesTerm(contact.department)) {
+        return true;
+      }
+
+      // Check addresses
+      if (matchesTerm(contact.homeCity) ||
+          matchesTerm(contact.homeState) ||
+          matchesTerm(contact.homeCountry) ||
+          matchesTerm(contact.businessCity) ||
+          matchesTerm(contact.businessState) ||
+          matchesTerm(contact.businessCountry)) {
+        return true;
+      }
+
+      // Check notes
+      if (matchesTerm(contact.notes)) {
+        return true;
+      }
+
+      // Check other fields
+      if (matchesTerm(contact.spouse) ||
+          matchesTerm(contact.children) ||
+          matchesTerm(contact.categories) ||
+          matchesTerm(contact.hobby) ||
+          matchesTerm(contact.location)) {
+        return true;
+      }
+
+      return false;
+    });
+  }
 
   editContact(contact: Contact) {
     this.router.navigate(['/contact', contact.id]);

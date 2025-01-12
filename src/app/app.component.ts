@@ -9,7 +9,9 @@ import { UpdateNotificationComponent } from './components/update-notification.co
   template: `<div class="app-container">
     <app-update-notification></app-update-notification>
     <app-nav-bar></app-nav-bar>
-    <router-outlet></router-outlet>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
   </div>`,
   styles: `.fullscreen-container {
     position: relative;
