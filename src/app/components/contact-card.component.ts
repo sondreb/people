@@ -9,12 +9,14 @@ import { AvatarService } from '../services/avatar.service';
     <div class="contact-card">
       <img 
         [src]="contact.imageUrl || avatarUrl" 
-        [alt]="contact.firstName"
+        [alt]="getFullName()"
         class="contact-image"
         (error)="handleImageError()"
       >
       <div class="contact-info">
-        <h3>{{ contact.firstName || contact.emailAddress || 'Unknown Contact' }}</h3>
+        <h3 (click)="onEdit.emit(contact)" class="name-link">
+          {{ getFullName() || contact.emailAddress || 'Unknown Contact' }}
+        </h3>
         <div *ngIf="contact.company" class="contact-company">
           <i class="fas fa-building"></i>
           <span>{{ contact.company }}</span>
@@ -108,6 +110,16 @@ import { AvatarService } from '../services/avatar.service';
       background: var(--danger);
       color: white;
     }
+
+    .name-link {
+      cursor: pointer;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+
+    .name-link:hover {
+      color: var(--primary);
+    }
   `],
   standalone: true,
   imports: [CommonModule]
@@ -132,5 +144,15 @@ export class ContactCardComponent {
     if (!this.contact.imageUrl) {
       this.avatarUrl = await this.avatarService.getAvatarUrl(this.contact.emailAddress || '');
     }
+  }
+
+  getFullName(): string {
+    const parts = [
+      this.contact.firstName,
+      this.contact.middleName,
+      this.contact.lastName
+    ].filter(part => part && part.trim().length > 0);
+    
+    return parts.join(' ');
   }
 }
