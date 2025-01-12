@@ -83,6 +83,14 @@ import { StorageService } from '../services/storage.service';
                   </div>
                 </div>
                 <div class="form-group">
+                    <label for="middleName">Middle Name</label>
+                    <input
+                      id="middleName"
+                      type="text"
+                      formControlName="middleName"
+                    />
+                  </div>
+                <div class="form-group">
                   <label for="lastName">Last Name</label>
                   <input
                     id="lastName"
@@ -185,14 +193,7 @@ import { StorageService } from '../services/storage.service';
                       formControlName="nickname"
                     />
                   </div>
-                  <div class="form-group">
-                    <label for="middleName">Middle Name</label>
-                    <input
-                      id="middleName"
-                      type="text"
-                      formControlName="middleName"
-                    />
-                  </div>
+                
                   <div class="form-group">
                     <label for="suffix">Suffix</label>
                     <input id="suffix" type="text" formControlName="suffix" />
