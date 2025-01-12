@@ -19,42 +19,53 @@ export class AvatarService {
     '#004E8C', // Dark Blue
   ];
 
-  async getAvatarUrl(email: string, size: number = 128): Promise<string> {
-    if (!email) {
+  async getAvatarUrl(email: string | undefined, name?: string, size: number = 128): Promise<string> {
+    if (!email && !name) {
       return this.generateDefaultAvatarUrl(size);
     }
 
-    const cleanEmail = email.trim().toLowerCase();
+    if (email) {
+      const cleanEmail = email.trim().toLowerCase();
 
-    // Try Gravatar first since it's more reliable
-    const hash = Md5.hashStr(cleanEmail);
-    const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}&d=404`;
-    try {
-      const gravatarResponse = await fetch(gravatarUrl);
-      if (gravatarResponse.ok) {
-        return gravatarUrl;
+      // Try Gravatar first since it's more reliable
+      const hash = Md5.hashStr(cleanEmail);
+      const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}&d=404`;
+      try {
+        const gravatarResponse = await fetch(gravatarUrl);
+        if (gravatarResponse.ok) {
+          return gravatarUrl;
+        }
+      } catch (e) {
+        console.log('Failed to load Gravatar');
       }
-    } catch (e) {
-      console.log('Failed to load Gravatar');
+
+      // Try Microsoft service directly
+      const outlookUrl = `https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email=${encodeURIComponent(cleanEmail)}&size=HR${size}x${size}`;
+      try {
+        const outlookResponse = await fetch(outlookUrl);
+        if (outlookResponse.ok) {
+          return outlookUrl;
+        }
+      } catch (e) {
+        console.log('Failed to load Outlook avatar');
+      }
+
+      // Fall back to generated avatar using email
+      const colorIndex = this.getConsistentIndex(cleanEmail);
+      const backgroundColor = this.colors[colorIndex];
+      const initials = this.getInitials(cleanEmail);
+      return this.generateAvatarDataUrl(initials, backgroundColor, size);
     }
 
-    // Try Microsoft service directly (will likely fail due to CORS but keeping for reference)
-    const outlookUrl = `https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email=${encodeURIComponent(cleanEmail)}&size=HR${size}x${size}`;
-    try {
-      const outlookResponse = await fetch(outlookUrl);
-      if (outlookResponse.ok) {
-        return outlookUrl;
-      }
-    } catch (e) {
-      console.log('Failed to load Outlook avatar');
+    // Generate avatar from name if no email is available
+    if (name) {
+      const colorIndex = this.getConsistentIndex(name);
+      const backgroundColor = this.colors[colorIndex];
+      const initials = this.getInitialsFromName(name);
+      return this.generateAvatarDataUrl(initials, backgroundColor, size);
     }
 
-    // Fall back to generated avatar
-    const colorIndex = this.getConsistentIndex(cleanEmail);
-    const backgroundColor = this.colors[colorIndex];
-    const initials = this.getInitials(cleanEmail);
-
-    return this.generateAvatarDataUrl(initials, backgroundColor, size);
+    return this.generateDefaultAvatarUrl(size);
   }
 
   // Helper method to check if an image URL is valid
@@ -81,6 +92,14 @@ export class AvatarService {
     const parts = email.split('@')[0].split(/[._-]/);
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].substring(0, 2).toUpperCase();
+  }
+
+  private getInitialsFromName(name: string): string {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
     return parts[0].substring(0, 2).toUpperCase();
   }

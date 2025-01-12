@@ -8,7 +8,7 @@ import { AvatarService } from '../services/avatar.service';
   template: `
     <div class="contact-card">
       <img 
-        [src]="contact.imageUrl || avatarUrl" 
+        [src]="avatarUrl" 
         [alt]="getFullName()"
         class="contact-image"
         (error)="handleImageError()"
@@ -133,16 +133,19 @@ export class ContactCardComponent {
 
   constructor(private avatarService: AvatarService) {}
 
-  async ngOnInit() {
-    if (!this.contact.imageUrl) {
-      this.avatarUrl = await this.avatarService.getAvatarUrl(this.contact.emailAddress || '');
-    }
+  ngOnInit() {
+    this.loadAvatar();
+  }
+
+  async loadAvatar() {
+    const name = this.getDisplayName();
+    this.avatarUrl = await this.avatarService.getAvatarUrl(this.contact.emailAddress, name);
   }
 
   async handleImageError() {
     // If the image fails to load, try to get a new avatar URL
     if (!this.contact.imageUrl) {
-      this.avatarUrl = await this.avatarService.getAvatarUrl(this.contact.emailAddress || '');
+      this.avatarUrl = await this.avatarService.getAvatarUrl(this.contact.emailAddress, this.getDisplayName());
     }
   }
 
@@ -154,5 +157,12 @@ export class ContactCardComponent {
     ].filter(part => part && part.trim().length > 0);
     
     return parts.join(' ');
+  }
+
+  private getDisplayName(): string {
+    const parts = [];
+    if (this.contact.firstName) parts.push(this.contact.firstName);
+    if (this.contact.lastName) parts.push(this.contact.lastName);
+    return parts.join(' ') || 'Unknown';
   }
 }
