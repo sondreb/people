@@ -5,6 +5,7 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
 import { Contact } from '../models/contact';
 import { ThemeService, Theme } from '../services/theme.service';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -160,7 +161,8 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     private storage: StorageService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -356,7 +358,7 @@ export class SettingsComponent implements OnInit {
       await this.storage.importContacts(this.contactsToImport);
       this.showImportDialog = false;
       this.contactsToImport = [];
-      window.location.reload();
+      await this.router.navigate(['/']); // Navigate to home after import
     } catch (error) {
         console.error(error);
       const errorMessage =
