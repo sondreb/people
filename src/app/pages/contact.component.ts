@@ -841,10 +841,9 @@ import { AvatarService } from '../services/avatar.service';
         left: 0;
         right: 0;
         background: var(--card);
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow);
         z-index: 100;
         height: 60px;
-        background-color: #f5f5f5;
         padding: 0 20px;
         display: flex;
         align-items: center;
@@ -938,13 +937,13 @@ import { AvatarService } from '../services/avatar.service';
       }
 
       .cancel-btn {
-        background: var(--text-light);
-        color: white;
+        background: var(--secondary);
+        color: var(--card);
       }
 
       button[type='submit'] {
         background: var(--primary);
-        color: white;
+        color: var(--card);
       }
 
       button[type='submit']:disabled {
@@ -1039,7 +1038,7 @@ import { AvatarService } from '../services/avatar.service';
         padding: 12px;
         border-radius: 6px;
         font-weight: 500;
-        transition: opacity 0.2s;
+        transition: all 0.2s;
       }
 
       input.invalid {
