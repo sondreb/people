@@ -26,20 +26,7 @@ export class AvatarService {
 
     const cleanEmail = email.trim().toLowerCase();
 
-    // Try Outlook first
-    const outlookUrl = `https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email=${encodeURIComponent(
-      cleanEmail
-    )}&size=HR${size}x${size}`;
-    try {
-      const outlookResponse = await fetch(outlookUrl);
-      if (outlookResponse.ok) {
-        return outlookUrl;
-      }
-    } catch (e) {
-      console.log('Failed to load Outlook avatar');
-    }
-
-    // Try Gravatar
+    // Try Gravatar first since it's more reliable
     const hash = Md5.hashStr(cleanEmail);
     const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}&d=404`;
     try {
@@ -51,12 +38,33 @@ export class AvatarService {
       console.log('Failed to load Gravatar');
     }
 
+    // Try Microsoft service directly (will likely fail due to CORS but keeping for reference)
+    const outlookUrl = `https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email=${encodeURIComponent(cleanEmail)}&size=HR${size}x${size}`;
+    try {
+      const outlookResponse = await fetch(outlookUrl);
+      if (outlookResponse.ok) {
+        return outlookUrl;
+      }
+    } catch (e) {
+      console.log('Failed to load Outlook avatar');
+    }
+
     // Fall back to generated avatar
     const colorIndex = this.getConsistentIndex(cleanEmail);
     const backgroundColor = this.colors[colorIndex];
     const initials = this.getInitials(cleanEmail);
 
     return this.generateAvatarDataUrl(initials, backgroundColor, size);
+  }
+
+  // Helper method to check if an image URL is valid
+  private async isImageUrlValid(url: string): Promise<boolean> {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      return response.ok && response.headers.get('content-type')?.startsWith('image/') || false;
+    } catch {
+      return false;
+    }
   }
 
   private getConsistentIndex(str: string): number {

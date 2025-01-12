@@ -7,7 +7,12 @@ import { AvatarService } from '../services/avatar.service';
   selector: 'app-contact-card',
   template: `
     <div class="contact-card">
-      <img [src]="contact.imageUrl || avatarUrl" [alt]="contact.firstName" class="contact-image">
+      <img 
+        [src]="contact.imageUrl || avatarUrl" 
+        [alt]="contact.firstName"
+        class="contact-image"
+        (error)="handleImageError()"
+      >
       <div class="contact-info">
         <h3>{{ contact.firstName || contact.emailAddress || 'Unknown Contact' }}</h3>
         <div *ngIf="contact.company" class="contact-company">
@@ -117,6 +122,13 @@ export class ContactCardComponent {
   constructor(private avatarService: AvatarService) {}
 
   async ngOnInit() {
+    if (!this.contact.imageUrl) {
+      this.avatarUrl = await this.avatarService.getAvatarUrl(this.contact.emailAddress || '');
+    }
+  }
+
+  async handleImageError() {
+    // If the image fails to load, try to get a new avatar URL
     if (!this.contact.imageUrl) {
       this.avatarUrl = await this.avatarService.getAvatarUrl(this.contact.emailAddress || '');
     }
