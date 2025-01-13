@@ -840,8 +840,6 @@ import { AvatarService } from '../services/avatar.service';
         bottom: 0;
         left: 0;
         right: 0;
-        background: var(--card);
-        box-shadow: var(--shadow);
         z-index: 100;
         height: 60px;
         padding: 0 20px;
